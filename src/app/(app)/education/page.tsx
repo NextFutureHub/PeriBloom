@@ -6,7 +6,7 @@ import { useAppData } from '@/hooks/use-app-data';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Progress } from '@/componentsin/ui/progress';
+import { Progress } from '@/components/ui/progress';
 
 export default function EducationPage() {
   const { getEducationalModules, educationProgress, toggleLessonComplete } = useAppData();
