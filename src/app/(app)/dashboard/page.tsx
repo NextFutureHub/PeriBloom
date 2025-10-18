@@ -1,14 +1,17 @@
 "use client";
 
+import { useState } from 'react';
 import { useAppData } from '@/hooks/use-app-data';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Bot, BookHeart, HeartPulse } from 'lucide-react';
+import { ArrowRight, Bot, BookHeart, HeartPulse, Eye, EyeOff } from 'lucide-react';
 import { differenceInWeeks, differenceInMonths, differenceInDays } from 'date-fns';
 import Link from 'next/link';
+import PregnancySky from '@/components/PregnancySky';
 
 export default function DashboardPage() {
   const { userData } = useAppData();
+  const [showElements, setShowElements] = useState(true);
 
   const getStatus = () => {
     if (!userData) return { title: '', value: '' };
@@ -38,72 +41,156 @@ export default function DashboardPage() {
 
   const { title, value } = getStatus();
 
+  // Получаем текущую неделю беременности для фона
+  const getCurrentWeek = () => {
+    if (!userData || userData.lifecycleStage !== 'pregnancy' || !userData.dueDate) {
+      return 1;
+    }
+    const now = new Date();
+    const dueDate = new Date(userData.dueDate);
+    const lmpDate = new Date(dueDate.getTime() - 40 * 7 * 24 * 60 * 60 * 1000);
+    const weeks = differenceInWeeks(now, lmpDate);
+    return Math.max(1, Math.min(40, weeks));
+  };
+
+  const currentWeek = getCurrentWeek();
+
+  const handleBackgroundClick = (e: React.MouseEvent) => {
+    // Клик только на фон, не на элементы
+    if (e.target === e.currentTarget) {
+      setShowElements(!showElements);
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold font-headline">Добро пожаловать, {userData?.name}!</h1>
-        <p className="text-muted-foreground">Готовы помочь вам на каждом шагу.</p>
+    <div className="relative min-h-screen" onClick={handleBackgroundClick}>
+      {/* 3D фон */}
+      <PregnancySky 
+        currentWeek={currentWeek} 
+        maxStars={1000} 
+        animate={true} 
+      />
+      
+      {/* Кнопка переключения видимости */}
+      <div className="absolute top-4 right-4 z-30">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowElements(!showElements);
+          }}
+          className="bg-white/90 backdrop-blur-md border-white/20 hover:bg-white/95"
+        >
+          {showElements ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          <span className="ml-2">{showElements ? 'Скрыть' : 'Показать'}</span>
+        </Button>
       </div>
+      
+      {/* Подсказка когда элементы скрыты */}
+      {!showElements && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/20 text-center">
+            <h3 className="text-lg font-bold text-gray-800 mb-1">🌟 Режим медитации</h3>
+            <p className="text-sm text-gray-600">Наслаждайтесь звёздным небом и бьющимся сердцем</p>
+          </div>
+        </div>
+      )}
+      
+      {/* Основной контент */}
+      <div className={`relative z-10 min-h-screen transition-all duration-500 ${showElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10 pointer-events-none'}`}>
+        {/* Приветственная секция */}
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl p-8 m-6 shadow-2xl border border-white/20">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold font-headline bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Добро пожаловать, {userData?.name}!
+            </h1>
+            <p className="text-lg text-muted-foreground">Готовы помочь вам на каждом шагу вашего пути</p>
+          </div>
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="md:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-lg">{title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-5xl font-bold text-primary">{value}</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Рекомендация дня</CardTitle>
-          </CardHeader>
-          <CardContent>
-             <p className="text-muted-foreground">Не забывайте пить достаточно воды в течение дня. Гидратация важна для вас и вашего малыша. Попробуйте выпивать не менее 8 стаканов воды.</p>
-             <Button variant="link" className="px-0">Узнать больше <ArrowRight className="ml-2 h-4 w-4" /></Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold font-headline">Быстрые действия</h2>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        <Link href="/symptom-journal">
-          <Card className="hover:bg-secondary transition-colors cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-lg font-medium">Добавить симптом</CardTitle>
-              <BookHeart className="h-6 w-6 text-primary" />
+        {/* Основные карточки */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 px-6">
+          {/* Карточка недели беременности */}
+          <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+            <CardHeader className="text-center pb-4">
+              <CardTitle className="text-2xl font-bold text-purple-600">{title}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Запишите свое самочувствие, чтобы отслеживать изменения.</p>
+            <CardContent className="text-center">
+              <div className="text-6xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                {value}
+              </div>
+              <p className="text-sm text-muted-foreground">неделя беременности</p>
             </CardContent>
           </Card>
-        </Link>
-        <Link href="/ai-assistant">
-          <Card className="hover:bg-secondary transition-colors cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-lg font-medium">AI-ассистент</CardTitle>
-              <Bot className="h-6 w-6 text-primary" />
+          
+          {/* Карточка рекомендации */}
+          <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 md:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-green-600">💡 Рекомендация дня</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Задайте вопрос и получите персональный совет.</p>
+              <p className="text-muted-foreground text-lg leading-relaxed">
+                Не забывайте пить достаточно воды в течение дня. Гидратация важна для вас и вашего малыша. 
+                Попробуйте выпивать не менее 8 стаканов воды.
+              </p>
+              <Button variant="link" className="px-0 mt-4 text-green-600 hover:text-green-700">
+                Узнать больше <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </CardContent>
           </Card>
-        </Link>
-        <Link href="/triage">
-          <Card className="hoverbg-secondary transition-colors cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-lg font-medium">Triage-анализ</CardTitle>
-              <HeartPulse className="h-6 w-6 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Оцените свои симптомы с помощью AI.</p>
-            </CardContent>
-          </Card>
-        </Link>
+        </div>
+
+        {/* Быстрые действия */}
+        <div className="px-6 mt-8">
+          <h2 className="text-3xl font-bold font-headline text-center mb-8 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            Быстрые действия
+          </h2>
+          
+          <div className="grid gap-6 md:grid-cols-3">
+            <Link href="/symptom-journal">
+              <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 p-4 bg-pink-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-pink-200 transition-colors">
+                    <BookHeart className="h-8 w-8 text-pink-600" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-gray-800">Добавить симптом</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-muted-foreground">Запишите свое самочувствие, чтобы отслеживать изменения.</p>
+                </CardContent>
+              </Card>
+            </Link>
+            
+            <Link href="/ai-assistant">
+              <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                    <Bot className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-gray-800">AI-ассистент</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-muted-foreground">Задайте вопрос и получите персональный совет.</p>
+                </CardContent>
+              </Card>
+            </Link>
+            
+            <Link href="/triage">
+              <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 p-4 bg-red-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                    <HeartPulse className="h-8 w-8 text-red-600" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-gray-800">Triage-анализ</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-muted-foreground">Оцените свои симптомы с помощью AI.</p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

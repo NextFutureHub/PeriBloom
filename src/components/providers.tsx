@@ -72,11 +72,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addSymptom = (symptom: Omit<Symptom, 'id'>) => {
     const newSymptom = { ...symptom, id: new Date().toISOString() };
-    setSymptoms(prev => [...prev, newSymptom]);
+    setSymptoms([...symptoms, newSymptom]);
   };
 
   const addAIMessage = (message: AIMessage) => {
-    setAiMessages(prev => [...prev, message]);
+    setAiMessages([...aiMessages, message]);
   }
   
   const clearAIChat = () => {
@@ -84,7 +84,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   const toggleLessonComplete = (lessonId: string) => {
-    setEducationProgress(prev => ({ ...prev, [lessonId]: !prev[lessonId] }));
+    setEducationProgress({ ...educationProgress, [lessonId]: !educationProgress[lessonId] });
   };
   
   const getEducationalModules = (): EducationalModule[] => [
@@ -110,7 +110,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       id: new Date().toISOString(),
       timestamp: new Date().toISOString(),
     };
-    setChatMessages(prev => [...prev, newMessage]);
+    setChatMessages([...chatMessages, newMessage]);
   }
 
   const resetAllData = () => {
