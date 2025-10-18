@@ -1,3 +1,34 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "edu-nutrition",
+      "description": "A vibrant flat lay of healthy food for a nutrition course.",
+      "imageUrl": "https://images.unsplash.com/photo-1606756790138-261d2b21cd75?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxoZWFsdGh5JTIwZm9vZHxlbnwwfHx8fDE3NjA3MzEwNzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "healthy food"
+    },
+    {
+      "id": "edu-breathing",
+      "description": "A serene image of a person meditating for a breathing exercises course.",
+      "imageUrl": "https://images.unsplash.com/photo-1724833984356-1a34b6f78f28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxtZWRpdGF0aW9uJTIweW9nYXxlbnwwfHx8fDE3NjA3NjA0NDJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "meditation yoga"
+    },
+    {
+      "id": "edu-baby-care",
+      "description": "A tender moment of a parent holding a baby's feet for a baby care course.",
+      "imageUrl": "https://images.unsplash.com/photo-1579991039446-55d26fa276ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxiYWJ5JTIwZmVldHxlbnwwfHx8fDE3NjA3NzY5NjR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "baby feet"
+    },
+    {
+      "id": "edu-postpartum",
+      "description": "An image representing self-care and recovery for a postpartum course.",
+      "imageUrl": "https://images.unsplash.com/photo-1554167838-07aa5723df3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzZWxmJTIwY2FyZXxlbnwwfHx8fDE3NjA3NzY5NjR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "self care"
+    },
+    {
+      "id": "hero-image",
+      "description": "A beautiful and calming hero image for the PeriBloom landing page.",
+      "imageUrl": "https://images.unsplash.com/photo-1596734098749-8691be5f0d49?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzZXJlbmUlMjBtb3RoZXJob29kfGVufDB8fHx8MTc2MDc3Njk2NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "serene motherhood"
+    }
+  ]
 }
