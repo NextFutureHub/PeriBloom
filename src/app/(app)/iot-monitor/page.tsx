@@ -19,6 +19,7 @@ export default function IoTMonitorPage() {
   const [reader, setReader] = useState<any>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [shouldStopReading, setShouldStopReading] = useState(false);
   
   useEffect(() => {
     if ('serial' in navigator) {
@@ -79,6 +80,7 @@ export default function IoTMonitorPage() {
     setError('');
     setIsReconnecting(false);
     setIsDisconnecting(false);
+    setShouldStopReading(false);
     
     try {
       // @ts-ignore
@@ -101,9 +103,9 @@ export default function IoTMonitorPage() {
 
       const readData = async () => {
         try {
-          while (newPort.readable && !isDisconnecting) {
+          while (newPort.readable) {
             const { value, done } = await newReader.read();
-            if (done || isDisconnecting) {
+            if (done) {
               break;
             }
             
@@ -115,7 +117,7 @@ export default function IoTMonitorPage() {
             
             for (const line of lines) {
               const trimmedLine = line.trim();
-              if (trimmedLine && !isDisconnecting) {
+              if (trimmedLine) {
                 try {
                   const data = JSON.parse(trimmedLine);
                   setDeviceData({
@@ -150,26 +152,55 @@ export default function IoTMonitorPage() {
   };
 
   const handleDisconnect = async () => {
-    // Сначала устанавливаем флаги для прерывания чтения
+    console.log("🧭 Начинаем отключение устройства...");
+
     setIsDisconnecting(true);
+    setShouldStopReading(true);
     setIsConnected(false);
-    
-    // Очищаем состояние
-    setIsReconnecting(false);
-    setDeviceData({ temp: 'N/A', humidity: 'N/A', sound: 'N/A' });
-    setRawData('');
-    setError(''); // Очищаем ошибки при отключении
-    localStorage.removeItem('iot-device-connected');
-    
-    // Очищаем ссылки
+
+    try {
+      if (reader) {
+        try {
+          console.log("⏸️ Прерываем чтение...");
+          await reader.cancel();
+        } catch (e) {
+          console.warn("reader.cancel() вернул ошибку:", e);
+        }
+
+        try {
+          reader.releaseLock();
+        } catch (e) {
+          console.warn("reader.releaseLock() не удалось:", e);
+        }
+      }
+
+      if (port) {
+        try {
+          console.log("🔒 Закрываем порт...");
+          await port.close();
+        } catch (e) {
+          console.warn("port.close() не удалось:", e);
+        }
+      }
+    } catch (err) {
+      console.error("⚠️ Глобальная ошибка при отключении:", err);
+    }
+
     setReader(null);
     setPort(null);
-    
-    // Сбрасываем флаг отключения после небольшой задержки
+    setDeviceData({ temp: 'N/A', humidity: 'N/A', sound: 'N/A' });
+    setRawData('');
+    setError('');
+    localStorage.removeItem('iot-device-connected');
+
+    console.log('✅ Устройство корректно отключено');
+
     setTimeout(() => {
       setIsDisconnecting(false);
-    }, 100);
+      setShouldStopReading(false);
+    }, 200);
   };
+  
   
   const getClimateStatus = () => {
     const temp = parseFloat(deviceData.temp);
