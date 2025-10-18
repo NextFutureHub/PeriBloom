@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -45,12 +45,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
+  useEffect(() => {
+    if (isInitialized && !userData) {
+      router.push('/');
+    }
+  }, [isInitialized, userData, router]);
+
   const handleLogout = () => {
     resetAllData();
     router.push('/');
   };
 
-  if (!isInitialized) {
+  if (!isInitialized || !userData) {
     return (
        <div className="flex h-screen w-full">
          <Skeleton className="hidden md:block h-full w-64" />
@@ -59,17 +65,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
            <Skeleton className="h-full w-full" />
          </div>
        </div>
-     );
-  }
-
-  if (!userData) {
-     if (typeof window !== 'undefined') {
-        router.push('/');
-     }
-     return (
-        <div className="flex h-screen w-full items-center justify-center">
-            <p>Redirecting...</p>
-        </div>
      );
   }
 
@@ -88,7 +83,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarMenu>
             {navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <Link href={item.href} passHref>
+                <Link href={item.href}>
                   <SidebarMenuButton
                     isActive={pathname === item.href}
                     tooltip={{ children: item.label, side: 'right' }}
@@ -104,7 +99,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarFooter className="border-t border-sidebar-border">
            <SidebarMenu>
             <SidebarMenuItem>
-                <Link href="/settings" passHref>
+                <Link href="/settings">
                   <SidebarMenuButton 
                     isActive={pathname === '/settings'}
                     tooltip={{ children: 'Настройки', side: 'right' }}>
