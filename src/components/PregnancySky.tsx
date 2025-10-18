@@ -18,10 +18,10 @@ interface StarFieldProps {
   animate: boolean;
 }
 
-interface EarthProps {
-  currentWeek: number;
-  animate: boolean;
-}
+// interface EarthProps {
+//   currentWeek: number;
+//   animate: boolean;
+// }
 
 // Компонент звёздного поля
 const StarField: React.FC<StarFieldProps> = ({ currentWeek, maxStars, animate }) => {
@@ -130,7 +130,7 @@ const Heart: React.FC<{ currentWeek: number; animate: boolean }> = ({ currentWee
       heartModel.scale.setScalar(scale);
       
       // Применяем красный материал
-      heartModel.traverse((child) => {
+      heartModel.traverse((child: THREE.Object3D) => {
         if (child instanceof THREE.Mesh) {
           child.material = new THREE.MeshPhysicalMaterial({
             color: "#ff0000",
@@ -200,15 +200,15 @@ const Heart: React.FC<{ currentWeek: number; animate: boolean }> = ({ currentWee
   );
 };
 
-// Простой компонент для отладки
-const DebugInfo: React.FC<{ currentWeek: number }> = ({ currentWeek }) => {
-  return (
-    <div className="absolute top-4 left-4 text-white z-20">
-      <p>Неделя: {currentWeek}</p>
-      <p>Звёзд: {Math.floor((currentWeek / 40) * 1000)}</p>
-    </div>
-  );
-};
+// Простой компонент для отладки (закомментировано)
+// const DebugInfo: React.FC<{ currentWeek: number }> = ({ currentWeek }) => {
+//   return (
+//     <div className="absolute top-4 left-4 text-white z-20">
+//       <p>Неделя: {currentWeek}</p>
+//       <p>Звёзд: {Math.floor((currentWeek / 40) * 1000)}</p>
+//     </div>
+//   );
+// };
 
 // Компонент для обработки ошибок WebGL
 const WebGLErrorHandler: React.FC = () => {
@@ -244,7 +244,7 @@ const FallbackSky: React.FC<{ currentWeek: number }> = ({ currentWeek }) => {
   
   return (
     <div className="absolute inset-0 z-0 bg-gradient-to-b from-blue-900 to-purple-900">
-      <style jsx>{`
+      <style>{`
         @keyframes twinkle {
           0%, 100% { opacity: 0.3; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.2); }

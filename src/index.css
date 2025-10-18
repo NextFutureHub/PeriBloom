@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 240 100% 99%;
+    --foreground: 255 15% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 255 15% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 255 15% 20%;
+    --primary: 255 45% 55%;
+    --primary-foreground: 255 45% 95%;
+    --secondary: 240 67% 97%;
+    --secondary-foreground: 255 15% 20%;
+    --muted: 240 20% 95%;
+    --muted-foreground: 240 5% 55%;
+    --accent: 300 26% 86%;
+    --accent-foreground: 255 15% 20%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 10% 90%;
+    --input: 240 10% 94%;
+    --ring: 255 45% 55%;
+    --chart-1: 255 45% 55%;
+    --chart-2: 300 26% 86%;
+    --chart-3: 240 67% 97%;
+    --chart-4: 240 20% 95%;
+    --chart-5: 240 5% 55%;
+    --radius: 0.5rem;
+
+    --sidebar-background: 240 50% 98%;
+    --sidebar-foreground: 255 15% 25%;
+    --sidebar-primary: 255 45% 55%;
+    --sidebar-primary-foreground: 255 45% 95%;
+    --sidebar-accent: 240 67% 95%;
+    --sidebar-accent-foreground: 255 15% 20%;
+    --sidebar-border: 240 10% 90%;
+    --sidebar-ring: 255 45% 55%;
+  }
+
+  .dark {
+    --background: 255 15% 10%;
+    --foreground: 240 100% 99%;
+    --card: 255 15% 12%;
+    --card-foreground: 240 100% 99%;
+    --popover: 255 15% 10%;
+    --popover-foreground: 240 100% 99%;
+    --primary: 255 45% 65%;
+    --primary-foreground: 255 15% 10%;
+    --secondary: 255 15% 20%;
+    --secondary-foreground: 240 100% 99%;
+    --muted: 255 15% 25%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 300 26% 30%;
+    --accent-foreground: 240 100% 99%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 255 15% 25%;
+    --input: 255 15% 25%;
+    --ring: 255 45% 65%;
+    --chart-1: 255 45% 65%;
+    --chart-2: 300 26% 76%;
+    --chart-3: 240 30% 60%;
+    --chart-4: 240 20% 55%;
+    --chart-5: 240 5% 45%;
+
+    --sidebar-background: 255 15% 12%;
+    --sidebar-foreground: 240 100% 99%;
+    --sidebar-primary: 255 45% 65%;
+    --sidebar-primary-foreground: 255 15% 10%;
+    --sidebar-accent: 255 15% 20%;
+    --sidebar-accent-foreground: 240 100% 99%;
+    --sidebar-border: 255 15% 25%;
+    --sidebar-ring: 255 45% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.star {
+  animation: twinkle 2s infinite ease-in-out;
+}
+
+.heart-beat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}

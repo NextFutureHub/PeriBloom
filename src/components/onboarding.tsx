@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { CalendarIcon, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -27,7 +27,7 @@ const onboardingSchema = z.object({
 });
 
 export function Onboarding() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { setUserData } = useAppData();
   const [step, setStep] = useState(1);
 
@@ -49,7 +49,7 @@ export function Onboarding() {
       language: 'ru' as const,
     };
     setUserData(userData);
-    router.push('/dashboard');
+      navigate('/app/dashboard');
   };
 
   return (
