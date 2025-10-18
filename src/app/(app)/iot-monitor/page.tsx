@@ -6,6 +6,7 @@ import { Thermometer, Waves, Ear } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
 
 export default function IoTMonitorPage() {
   const [isSupported, setIsSupported] = useState(false);
