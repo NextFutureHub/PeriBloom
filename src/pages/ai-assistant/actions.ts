@@ -2,7 +2,7 @@
 export async function getAIResponse({ lifecycleStage, query }: { lifecycleStage: string; query: string }) {
   try {
     // Получаем API ключ из переменных окружения или используем демо ключ
-    const apiKey = import.meta.env.VITE_GOOGLE_AI_API_KEY || 'demo-key';
+    const apiKey = (import.meta as any).env.VITE_GOOGLE_AI_API_KEY || 'demo-key';
     
     if (apiKey === 'demo-key') {
       // Fallback на умные ответы если нет API ключа

@@ -10,17 +10,17 @@ import { useAppData } from '@/hooks/use-app-data';
 import { User, Bell, Shield, Trash2 } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { userData, updateUserData, resetAllData } = useAppData();
+  const { userData, setUserData, resetAllData } = useAppData();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (userData) {
-      updateUserData({ ...userData, name: e.target.value });
+      setUserData({ ...userData, name: e.target.value });
     }
   };
 
   const handleLifecycleStageChange = (value: string) => {
     if (userData) {
-      updateUserData({ ...userData, lifecycleStage: value });
+      setUserData({ ...userData, lifecycleStage: value as 'pregnancy' | 'postpartum' | 'childcare' });
     }
   };
 

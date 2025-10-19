@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Phone, Mail, MapPin, Clock, Stethoscope, Heart, Baby } from 'lucide-react';
+import { Phone, Mail, Clock, Stethoscope, Heart, Baby } from 'lucide-react';
 
 export default function ContactsPage() {
   const emergencyContacts = [

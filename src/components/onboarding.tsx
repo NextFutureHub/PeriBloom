@@ -9,7 +9,6 @@ import { CalendarIcon, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { useAppData } from '@/hooks/use-app-data';
-import type { LifeCycleStage } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';

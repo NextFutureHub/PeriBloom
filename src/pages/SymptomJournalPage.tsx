@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useAppData } from '@/hooks/use-app-data';
 import SymptomCalendar from './symptom-journal/symptom-calendar';
 import { SymptomForm } from './symptom-journal/symptom-form';

@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
-  BookOpen, 
   Heart, 
   Baby, 
   Stethoscope, 
@@ -40,7 +39,7 @@ interface EducationalModule {
 }
 
 export default function EducationPage() {
-  const { educationProgress, toggleLessonComplete, getEducationalModules } = useAppData();
+  const { educationProgress, toggleLessonComplete } = useAppData();
   const [selectedModule, setSelectedModule] = useState<EducationalModule | null>(null);
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
 

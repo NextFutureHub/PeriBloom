@@ -19,10 +19,8 @@ export default function IoTMonitorPage() {
     timestamp: new Date().toLocaleTimeString()
   });
   const [error, setError] = useState('');
-  const [port, setPort] = useState<any>(null);
   const [rawData, setRawData] = useState('');
   const [debugMode, setDebugMode] = useState(false);
-  const [reader, setReader] = useState<any>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [shouldStopReading, setShouldStopReading] = useState(false);
@@ -120,7 +118,6 @@ export default function IoTMonitorPage() {
       
       await newPort.open({ baudRate: 9600 });
       
-      setPort(newPort);
       portRef.current = newPort;
       setIsConnected(true);
       setConnectionStatus('connected');
@@ -132,7 +129,6 @@ export default function IoTMonitorPage() {
       const textDecoder = new TextDecoderStream();
       newPort.readable.pipeTo(textDecoder.writable);
       const newReader = textDecoder.readable.getReader();
-      setReader(newReader);
       readerRef.current = newReader;
       
       let buffer = '';
@@ -202,9 +198,7 @@ export default function IoTMonitorPage() {
       setIsConnected(false);
       
       // Принудительная очистка при ошибке
-      setPort(null);
       portRef.current = null;
-      setReader(null);
       readerRef.current = null;
     }
   };
@@ -253,8 +247,6 @@ export default function IoTMonitorPage() {
     }
 
     // Сбрасываем все состояния
-    setReader(null);
-    setPort(null);
     readerRef.current = null;
     portRef.current = null;
     setDeviceData({ temp: 'N/A', humidity: 'N/A', sound: 'N/A', timestamp: '' });
@@ -302,8 +294,6 @@ export default function IoTMonitorPage() {
     }
 
     // Полный сброс состояния
-    setReader(null);
-    setPort(null);
     readerRef.current = null;
     portRef.current = null;
     setIsConnected(false);

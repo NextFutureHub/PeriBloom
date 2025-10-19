@@ -1,9 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Bot, Send, Trash2, User } from "lucide-react";
+import { Bot, Send, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import React from 'react';
 
 import { useAppData } from "@/hooks/use-app-data";
 import { Button } from "@/components/ui/button";
@@ -65,7 +64,7 @@ export default function AIAssistantPage() {
           const aiResponse = {
               id: new Date().toISOString() + '-ai',
               role: 'assistant' as const,
-              content: result.success ? result.response : result.error || 'Произошла ошибка',
+              content: result.success ? result.response : 'Произошла ошибка при обработке запроса',
           };
           
           addAIMessage(aiResponse);

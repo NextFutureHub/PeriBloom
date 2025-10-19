@@ -82,11 +82,15 @@ export default function TriagePage() {
     setAnalysisResult(null);
     setError(null);
 
-    const result = await getTriageAnalysis(values);
-    if (result.success) {
-      setAnalysisResult({ riskLevel: result.riskLevel!, recommendations: result.recommendations! });
-    } else {
-      setError(result.error || 'Произошла неизвестная ошибка.');
+    try {
+      const result = await getTriageAnalysis(values);
+      if (result.success) {
+        setAnalysisResult({ riskLevel: result.riskLevel!, recommendations: result.recommendations! });
+      } else {
+        setError('Не удалось проанализировать симптомы. Попробуйте еще раз.');
+      }
+    } catch (err) {
+      setError('Произошла ошибка при анализе. Попробуйте еще раз.');
     }
     setIsAnalyzing(false);
   };

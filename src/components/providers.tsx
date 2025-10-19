@@ -51,10 +51,12 @@ const cleanSymptomsArray = (symptoms: any[]): any[] => {
 };
 
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => void] => {
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-
-  useEffect(() => {
+  const [storedValue, setStoredValue] = useState<T>(() => {
     try {
+      if (typeof window === 'undefined') {
+        return initialValue;
+      }
+      
       const item = window.localStorage.getItem(key);
       if (item) {
         const parsed = JSON.parse(item);
@@ -64,24 +66,29 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => vo
           const cleanedSymptoms = cleanSymptomsArray(parsed);
           if (cleanedSymptoms.length !== parsed.length) {
             console.warn(`Очищено ${parsed.length - cleanedSymptoms.length} некорректных записей симптомов`);
-            setStoredValue(cleanedSymptoms as T);
-            return;
+            return cleanedSymptoms as T;
           }
+          return cleanedSymptoms as T;
         }
         
-        setStoredValue(parsed);
+        return parsed;
       }
     } catch (error) {
       console.error(`Ошибка при загрузке из localStorage для ${key}:`, error);
       // В случае ошибки, очищаем поврежденные данные
       if (key === 'peribloom-symptoms') {
         console.warn('Очистка поврежденных данных симптомов');
-        setStoredValue([] as T);
+        return [] as T;
       }
     }
-  }, [key]);
+    return initialValue;
+  });
   
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    
     try {
       // Валидация перед сохранением
       let valueToSave = storedValue;
@@ -115,12 +122,19 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => vo
 export function AppProvider({ children }: { children: ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [userData, setUserData] = useLocalStorage<UserData | null>('peribloom-user-data', null);
+  
+  // Отладочная информация
+  useEffect(() => {
+    console.log('AppProvider: userData changed to:', userData);
+  }, [userData]);
   const [symptoms, setSymptoms] = useLocalStorage<Symptom[]>('peribloom-symptoms', []);
   const [aiMessages, setAiMessages] = useLocalStorage<AIMessage[]>('peribloom-ai-messages', []);
   const [educationProgress, setEducationProgress] = useLocalStorage<Record<string, boolean>>('peribloom-education-progress', {});
   const [chatMessages, setChatMessages] = useLocalStorage<ChatMessage[]>('peribloom-chat-messages', []);
 
   useEffect(() => {
+    console.log('AppProvider: Initializing...');
+    console.log('AppProvider: userData from localStorage:', userData);
     setIsInitialized(true);
   }, []);
 

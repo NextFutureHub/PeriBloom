@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAppData } from '@/hooks/use-app-data';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Bot, BookHeart, HeartPulse, Eye, EyeOff } from 'lucide-react';
 import { differenceInWeeks, differenceInMonths, differenceInDays } from 'date-fns';
