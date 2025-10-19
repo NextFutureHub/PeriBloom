@@ -27,7 +27,6 @@ export const AppContext = createContext<AppContextType | null>(null);
 
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => void] => {
   const [storedValue, setStoredValue] = useState<T>(initialValue);
-  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     try {
@@ -36,21 +35,17 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => vo
         setStoredValue(JSON.parse(item));
       }
     } catch (error) {
-      console.log(error);
+      console.error(`Ошибка при загрузке из localStorage для ${key}:`, error);
     }
-    setIsInitialized(true);
   }, [key]);
   
   useEffect(() => {
-    if (isInitialized) {
-      try {
-        window.localStorage.setItem(key, JSON.stringify(storedValue));
-      } catch (error) {
-        console.log(error);
-      }
+    try {
+      window.localStorage.setItem(key, JSON.stringify(storedValue));
+    } catch (error) {
+      console.error(`Ошибка при сохранении в localStorage для ${key}:`, error);
     }
-  }, [key, storedValue, isInitialized]);
-
+  }, [key, storedValue]);
 
   return [storedValue, setStoredValue];
 };
@@ -64,10 +59,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [chatMessages, setChatMessages] = useLocalStorage<ChatMessage[]>('peribloom-chat-messages', []);
 
   useEffect(() => {
-    // We can only be sure we've loaded from localStorage when all hooks are initialized
-    // A more robust solution might use Promise.all if useLocalStorage returned initialization status
-    const timer = setTimeout(() => setIsInitialized(true), 100);
-    return () => clearTimeout(timer);
+    setIsInitialized(true);
   }, []);
 
   const addSymptom = (symptom: Omit<Symptom, 'id'>) => {
@@ -76,7 +68,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const addAIMessage = (message: AIMessage) => {
-    setAiMessages([...aiMessages, message]);
+    // Создаем новый массив с добавленным сообщением
+    const newMessages = [...aiMessages, message];
+    setAiMessages(newMessages);
   }
   
   const clearAIChat = () => {

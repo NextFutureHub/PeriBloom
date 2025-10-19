@@ -24,6 +24,7 @@ export default function AIAssistantPage() {
   const [isThinking, setIsThinking] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
+  
   const form = useForm<z.infer<typeof chatSchema>>({
     resolver: zodResolver(chatSchema),
     defaultValues: { query: "" },
@@ -49,23 +50,36 @@ export default function AIAssistantPage() {
       role: 'user' as const,
       content: values.query,
     };
+    
     addAIMessage(userMessage);
     form.reset();
     setIsThinking(true);
 
-    if (userData) {
-        const result = await getAIResponse({
-            lifecycleStage: userData.lifecycleStage,
-            query: values.query
-        });
+    try {
+      if (userData) {
+          const result = await getAIResponse({
+              lifecycleStage: userData.lifecycleStage,
+              query: values.query
+          });
 
-        const aiResponse = {
-            id: new Date().toISOString() + 'ai',
-            role: 'assistant' as const,
-            content: result.success ? result.response : result.error || 'An error occurred',
-        };
-        addAIMessage(aiResponse);
+          const aiResponse = {
+              id: new Date().toISOString() + '-ai',
+              role: 'assistant' as const,
+              content: result.success ? result.response : result.error || 'Произошла ошибка',
+          };
+          
+          addAIMessage(aiResponse);
+      }
+    } catch (error) {
+      console.error('Ошибка при получении ответа от AI:', error);
+      const errorResponse = {
+        id: new Date().toISOString() + '-error',
+        role: 'assistant' as const,
+        content: 'Извините, произошла ошибка при обработке вашего запроса. Попробуйте еще раз.',
+      };
+      addAIMessage(errorResponse);
     }
+    
     setIsThinking(false);
     setTimeout(scrollToBottom, 100);
   };
