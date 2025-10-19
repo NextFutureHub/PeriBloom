@@ -8,7 +8,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const AnalyzeSymptomsInputSchema = z.object({
   symptomsDescription: z
@@ -23,7 +23,7 @@ const AnalyzeSymptomsOutputSchema = z.object({
     .describe('The assessed risk level of the symptoms (low, medium, high).'),
   recommendations: z
     .string()
-    .describe('Recommended actions based on the symptom analysis.'),
+    .describe('Detailed and personalized recommendations based on the specific symptoms described. Should be different for each risk level and symptom type.'),
 });
 export type AnalyzeSymptomsOutput = z.infer<typeof AnalyzeSymptomsOutputSchema>;
 
@@ -37,14 +37,26 @@ const triagePrompt = ai.definePrompt({
   name: 'triagePrompt',
   input: {schema: AnalyzeSymptomsInputSchema},
   output: {schema: AnalyzeSymptomsOutputSchema},
-  prompt: `You are an AI-powered medical triage assistant.
+  prompt: `Вы - AI-ассистент медицинского триажа для беременных женщин.
 
-  Analyze the following symptoms and determine the risk level (low, medium, or high).
-  Provide clear and concise recommendations based on the analysis.
+Проанализируйте описанные симптомы и определите уровень риска (low, medium, high).
+Дайте четкие и персонализированные рекомендации на основе анализа.
 
-  Symptoms: {{{symptomsDescription}}}
+Симптомы: {{{symptomsDescription}}}
 
-  Respond in JSON format.`,
+Критерии оценки риска:
+- HIGH: Сильная боль, кровотечение, высокая температура (>38.5°C), потеря сознания, затрудненное дыхание, сильная тошнота/рвота, судороги, острая боль в животе
+- MEDIUM: Умеренная боль, головная боль, тошнота, слабость, головокружение, дискомфорт в животе, легкое недомогание
+- LOW: Легкие симптомы, усталость, легкий дискомфорт, которые не влияют на повседневную деятельность
+
+Для каждого уровня риска давайте специфические рекомендации:
+- HIGH: Немедленная медицинская помощь, вызов скорой
+- MEDIUM: Обращение к врачу в течение 24-48 часов, мониторинг симптомов
+- LOW: Самонаблюдение, отдых, при ухудшении - к врачу
+
+Учитывайте, что это беременная женщина, поэтому будьте особенно внимательны к симптомам, которые могут указывать на осложнения беременности.
+
+Отвечайте в JSON формате на русском языке.`,
 });
 
 const analyzeSymptomsFlow = ai.defineFlow(
