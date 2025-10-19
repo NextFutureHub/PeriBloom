@@ -37,17 +37,17 @@ export default function SymptomJournalPage() {
             <h2 className="text-2xl font-semibold font-headline">Журнал симптомов</h2>
             <p className="text-muted-foreground">Отслеживайте свое самочувствие день за днем.</p>
         </div>
-        <div className="flex gap-2">
-            <Button variant="outline" onClick={handleExport} disabled={symptoms.length === 0}>
-                Экспорт в PDF
-            </Button>
-            <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                <DialogTrigger asChild>
-                    <Button>
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Добавить запись
-                    </Button>
-                </DialogTrigger>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button variant="outline" onClick={handleExport} disabled={symptoms.length === 0} className="w-full sm:w-auto">
+            Экспорт в PDF
+          </Button>
+          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+            <DialogTrigger asChild>
+              <Button className="w-full sm:w-auto">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Добавить запись
+              </Button>
+            </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Добавить запись о симптоме</DialogTitle>
@@ -61,8 +61,8 @@ export default function SymptomJournalPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <div className="md:col-span-1">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
+        <div className="lg:col-span-1">
           <Card>
             <CardContent className="p-0">
               <SymptomCalendar
@@ -73,7 +73,7 @@ export default function SymptomJournalPage() {
             </CardContent>
           </Card>
         </div>
-        <div className="md:col-span-2">
+        <div className="lg:col-span-2">
           <Card className="h-full">
             <CardHeader>
               <CardTitle>
