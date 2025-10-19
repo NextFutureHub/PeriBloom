@@ -24,9 +24,9 @@ export default function SymptomJournalPage() {
     (symptom) => symptom.date === format(selectedDate, 'yyyy-MM-dd')
   ).sort((a, b) => a.time.localeCompare(b.time));
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (userData) {
-      generateSymptomReport(symptoms, userData);
+      await generateSymptomReport(symptoms, userData);
     }
   };
 

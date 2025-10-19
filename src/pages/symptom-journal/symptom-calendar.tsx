@@ -1,11 +1,10 @@
 "use client";
 
-import Calendar from 'react-calendar';
-import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import 'react-calendar/dist/Calendar.css';
+import { ru } from "date-fns/locale";
+import { buttonVariants } from "@/components/ui/button";
 
 interface SymptomCalendarProps {
   selectedDate: Date;
@@ -41,192 +40,63 @@ export default function SymptomCalendar({ selectedDate, setSelectedDate, symptom
     return 'low';
   };
 
-  const tileContent = ({ date, view }: { date: Date; view: string }) => {
-    if (view === 'month') {
-      const symptomCount = getSymptomCountForDate(date);
-      const severity = getSeverityForDate(date);
-      
-      if (symptomCount > 0) {
-        return (
-          <div className="absolute -bottom-1 -right-1 z-10">
-            <Badge 
-              variant={severity === 'high' ? 'destructive' : severity === 'medium' ? 'secondary' : 'default'}
-              className={cn(
-                "h-4 w-4 sm:h-5 sm:w-5 rounded-full p-0 text-xs flex items-center justify-center",
-                severity === 'medium' && 'bg-yellow-200 text-yellow-800'
-              )}
-            >
-              {symptomCount}
-            </Badge>
-          </div>
-        );
-      }
-    }
-    return null;
+  const modifiers = {
+    hasSymptoms: (date: Date) => getSymptomCountForDate(date) > 0,
+    highSeverity: (date: Date) => getSeverityForDate(date) === 'high',
+    mediumSeverity: (date: Date) => getSeverityForDate(date) === 'medium',
+    lowSeverity: (date: Date) => getSeverityForDate(date) === 'low',
   };
 
-  const tileClassName = ({ date, view }: { date: Date; view: string }) => {
-    if (view === 'month') {
-      const isSelected = selectedDate && 
-        date.getDate() === selectedDate.getDate() && 
-        date.getMonth() === selectedDate.getMonth() && 
-        date.getFullYear() === selectedDate.getFullYear();
-      
-      return cn(
-        "relative",
-        isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
-      );
-    }
-    return null;
+  const modifiersClassNames = {
+    hasSymptoms: 'relative after:content-[""] after:absolute after:-bottom-1 after:-right-1 after:h-4 after:w-4 after:bg-primary after:rounded-full after:z-10',
+    highSeverity: 'border-l-4 border-l-red-500',
+    mediumSeverity: 'border-l-4 border-l-yellow-500',
+    lowSeverity: 'border-l-4 border-l-green-500',
   };
 
   return (
     <div className="p-2 sm:p-4">
-      <style>{`
-        .react-calendar {
-          width: 100%;
-          max-width: 100%;
-          background: white;
-          border: 1px solid #e2e8f0;
-          border-radius: 0.5rem;
-          font-family: inherit;
-        }
-        
-        .react-calendar__navigation {
-          display: flex;
-          height: 44px;
-          margin-bottom: 1em;
-          align-items: center;
-          justify-content: space-between;
-        }
-        
-        .react-calendar__navigation button {
-          min-width: 44px;
-          background: none;
-          border: none;
-          font-size: 16px;
-          margin-top: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        
-        .react-calendar__navigation button:enabled:hover,
-        .react-calendar__navigation button:enabled:focus {
-          background-color: #f1f5f9;
-          border-radius: 0.375rem;
-        }
-        
-        .react-calendar__navigation button[disabled] {
-          background-color: #f0f0f0;
-        }
-        
-        .react-calendar__month-view__weekdays {
-          text-align: center;
-          text-transform: uppercase;
-          font-weight: bold;
-          font-size: 0.75rem;
-          padding: 0.5rem 0;
-        }
-        
-        .react-calendar__month-view__weekdays__weekday {
-          padding: 0.5rem;
-          font-size: 0.75rem;
-          color: #64748b;
-        }
-        
-        .react-calendar__month-view__days {
-          display: grid;
-          grid-template-columns: repeat(7, 1fr);
-          gap: 1px;
-        }
-        
-        .react-calendar__tile {
-          max-width: 100%;
-          padding: 0.5rem;
-          background: none;
-          border: none;
-          font-size: 0.875rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          min-height: 2.5rem;
-          aspect-ratio: 1;
-        }
-        
-        .react-calendar__tile:enabled:hover,
-        .react-calendar__tile:enabled:focus {
-          background-color: #f1f5f9;
-          border-radius: 0.375rem;
-        }
-        
-        .react-calendar__tile--now {
-          background-color: #f1f5f9;
-          border-radius: 0.375rem;
-        }
-        
-        .react-calendar__tile--active {
-          background-color: #3b82f6;
-          color: white;
-          border-radius: 0.375rem;
-        }
-        
-        .react-calendar__tile--active:enabled:hover,
-        .react-calendar__tile--active:enabled:focus {
-          background-color: #2563eb;
-        }
-        
-        .react-calendar__tile--hasActive {
-          background-color: #3b82f6;
-          color: white;
-          border-radius: 0.375rem;
-        }
-        
-        .react-calendar__tile--hasActive:enabled:hover,
-        .react-calendar__tile--hasActive:enabled:focus {
-          background-color: #2563eb;
-        }
-        
-        .react-calendar__tile--neighboringMonth {
-          color: #94a3b8;
-        }
-        
-        @media (max-width: 640px) {
-          .react-calendar__tile {
-            min-height: 2rem;
-            font-size: 0.75rem;
-            padding: 0.25rem;
-          }
-          
-          .react-calendar__month-view__weekdays__weekday {
-            font-size: 0.625rem;
-            padding: 0.25rem;
-          }
-        }
-      `}</style>
-      
       <Calendar
-        onChange={(value) => setSelectedDate(value as Date)}
-        value={selectedDate}
-        tileContent={tileContent}
-        tileClassName={tileClassName}
-        navigationLabel={({ date }) => {
-          const months = [
-            'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-          ];
-          return `${months[date.getMonth()]} ${date.getFullYear()}`;
+        mode="single"
+        selected={selectedDate}
+        onSelect={(date) => {
+          console.log('Calendar onSelect called with:', date);
+          console.log('Current selectedDate before update:', selectedDate);
+          if (date) {
+            setSelectedDate(date);
+            console.log('Updated selectedDate to:', date);
+          }
         }}
-        formatShortWeekday={(_, date) => {
-          const weekdays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-          return weekdays[date.getDay()];
+        locale={ru}
+        modifiers={modifiers}
+        modifiersClassNames={modifiersClassNames}
+        classNames={{
+          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+          month: "space-y-4",
+          caption: "flex justify-center pt-1 relative items-center",
+          caption_label: "text-sm font-medium",
+          nav: "space-x-1 flex items-center",
+          nav_button: cn(
+            buttonVariants({ variant: "outline" }),
+            "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+          ),
+          nav_button_previous: "absolute left-1",
+          nav_button_next: "absolute right-1",
+          table: "w-full border-collapse space-y-1",
+          head_row: "flex",
+          head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+          row: "flex w-full mt-2",
+          cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+          day: cn(
+            buttonVariants({ variant: "ghost" }),
+            "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
+          ),
+          day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+          day_today: "bg-accent text-accent-foreground",
+          day_outside: "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
+          day_disabled: "text-muted-foreground opacity-50",
+          day_hidden: "invisible",
         }}
-        prevLabel={<ChevronLeft className="h-4 w-4" />}
-        nextLabel={<ChevronRight className="h-4 w-4" />}
-        prev2Label={null}
-        next2Label={null}
-        showNeighboringMonth={false}
       />
     </div>
   );

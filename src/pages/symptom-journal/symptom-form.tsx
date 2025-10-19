@@ -13,12 +13,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAppData } from "@/hooks/use-app-data";
 
 const symptomSchema = z.object({
-  symptom: z.string().min(1, "Опишите симптом"),
+  symptom: z.string()
+    .min(1, "Опишите симптом")
+    .max(500, "Описание симптома не должно превышать 500 символов"),
   severity: z.enum(["low", "medium", "high"], {
     required_error: "Выберите степень тяжести",
   }),
   time: z.string().min(1, "Укажите время"),
-  comment: z.string().optional(),
+  comment: z.string()
+    .max(1000, "Комментарий не должен превышать 1000 символов")
+    .optional(),
 });
 
 interface SymptomFormProps {
@@ -43,23 +47,42 @@ export function SymptomForm({ setFormOpen, selectedDate }: SymptomFormProps) {
   const onSubmit = async (values: z.infer<typeof symptomSchema>) => {
     setIsSubmitting(true);
     
-    console.log('Form values:', values); // Отладочная информация
-    
-    const newSymptom = {
-      id: new Date().toISOString(),
-      date: format(selectedDate, 'yyyy-MM-dd'),
-      symptom: values.symptom,
-      severity: values.severity,
-      time: values.time,
-      comment: values.comment || "",
-    };
+    try {
+      console.log('Form values:', values); // Отладочная информация
+      
+      // Валидация и очистка данных
+      const cleanSymptom = {
+        id: new Date().toISOString(),
+        date: format(selectedDate, 'yyyy-MM-dd'),
+        symptom: values.symptom.trim(),
+        severity: values.severity,
+        time: values.time.trim(),
+        comment: (values.comment || "").trim(),
+      };
 
-    console.log('New symptom:', newSymptom); // Отладочная информация
-    
-    addSymptom(newSymptom);
-    setFormOpen(false);
-    form.reset();
-    setIsSubmitting(false);
+      // Дополнительная валидация
+      if (!cleanSymptom.symptom || cleanSymptom.symptom.length === 0) {
+        console.error('Симптом не может быть пустым');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (cleanSymptom.symptom.length > 500) {
+        console.error('Описание симптома слишком длинное');
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log('New symptom:', cleanSymptom); // Отладочная информация
+      
+      addSymptom(cleanSymptom);
+      setFormOpen(false);
+      form.reset();
+    } catch (error) {
+      console.error('Ошибка при добавлении симптома:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -72,8 +95,15 @@ export function SymptomForm({ setFormOpen, selectedDate }: SymptomFormProps) {
             <FormItem>
               <FormLabel>Симптом</FormLabel>
               <FormControl>
-                <Input placeholder="Опишите ваш симптом..." {...field} />
+                <Input 
+                  placeholder="Опишите ваш симптом..." 
+                  {...field} 
+                  maxLength={500}
+                />
               </FormControl>
+              <div className="text-sm text-muted-foreground">
+                {field.value?.length || 0}/500 символов
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -128,8 +158,12 @@ export function SymptomForm({ setFormOpen, selectedDate }: SymptomFormProps) {
                   placeholder="Дополнительные детали..." 
                   {...field} 
                   className="min-h-[80px]"
+                  maxLength={1000}
                 />
               </FormControl>
+              <div className="text-sm text-muted-foreground">
+                {field.value?.length || 0}/1000 символов
+              </div>
               <FormMessage />
             </FormItem>
           )}

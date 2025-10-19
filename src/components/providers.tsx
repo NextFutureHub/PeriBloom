@@ -25,6 +25,31 @@ type AppContextType = {
 
 export const AppContext = createContext<AppContextType | null>(null);
 
+// Функция для валидации и очистки данных симптомов
+const validateSymptom = (symptom: any): boolean => {
+  return symptom && 
+         typeof symptom === 'object' &&
+         typeof symptom.id === 'string' &&
+         typeof symptom.date === 'string' &&
+         typeof symptom.symptom === 'string' &&
+         typeof symptom.severity === 'string' &&
+         ['low', 'medium', 'high'].includes(symptom.severity);
+};
+
+// Функция для очистки массива симптомов
+const cleanSymptomsArray = (symptoms: any[]): any[] => {
+  if (!Array.isArray(symptoms)) return [];
+  
+  return symptoms
+    .filter(validateSymptom)
+    .map(symptom => ({
+      ...symptom,
+      symptom: typeof symptom.symptom === 'string' ? symptom.symptom.trim() : '',
+      comment: typeof symptom.comment === 'string' ? symptom.comment.trim() : '',
+      time: typeof symptom.time === 'string' ? symptom.time.trim() : ''
+    }));
+};
+
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => void] => {
   const [storedValue, setStoredValue] = useState<T>(initialValue);
 
@@ -32,18 +57,55 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => vo
     try {
       const item = window.localStorage.getItem(key);
       if (item) {
-        setStoredValue(JSON.parse(item));
+        const parsed = JSON.parse(item);
+        
+        // Специальная обработка для симптомов
+        if (key === 'peribloom-symptoms' && Array.isArray(parsed)) {
+          const cleanedSymptoms = cleanSymptomsArray(parsed);
+          if (cleanedSymptoms.length !== parsed.length) {
+            console.warn(`Очищено ${parsed.length - cleanedSymptoms.length} некорректных записей симптомов`);
+            setStoredValue(cleanedSymptoms as T);
+            return;
+          }
+        }
+        
+        setStoredValue(parsed);
       }
     } catch (error) {
       console.error(`Ошибка при загрузке из localStorage для ${key}:`, error);
+      // В случае ошибки, очищаем поврежденные данные
+      if (key === 'peribloom-symptoms') {
+        console.warn('Очистка поврежденных данных симптомов');
+        setStoredValue([] as T);
+      }
     }
   }, [key]);
   
   useEffect(() => {
     try {
-      window.localStorage.setItem(key, JSON.stringify(storedValue));
+      // Валидация перед сохранением
+      let valueToSave = storedValue;
+      
+      if (key === 'peribloom-symptoms' && Array.isArray(storedValue)) {
+        valueToSave = cleanSymptomsArray(storedValue) as T;
+      }
+      
+      window.localStorage.setItem(key, JSON.stringify(valueToSave));
     } catch (error) {
       console.error(`Ошибка при сохранении в localStorage для ${key}:`, error);
+      // Если не удается сохранить, попробуем очистить localStorage
+      if (error instanceof DOMException && error.code === 22) {
+        console.warn('localStorage переполнен, очистка старых данных');
+        try {
+          // Очищаем старые данные симптомов, оставляя только последние 100 записей
+          if (key === 'peribloom-symptoms' && Array.isArray(storedValue)) {
+            const recentSymptoms = storedValue.slice(-100);
+            window.localStorage.setItem(key, JSON.stringify(recentSymptoms));
+          }
+        } catch (retryError) {
+          console.error('Не удалось сохранить даже урезанные данные:', retryError);
+        }
+      }
     }
   }, [key, storedValue]);
 
@@ -63,8 +125,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addSymptom = (symptom: Omit<Symptom, 'id'>) => {
-    const newSymptom = { ...symptom, id: new Date().toISOString() };
-    setSymptoms([...symptoms, newSymptom]);
+    try {
+      // Валидация и очистка данных перед добавлением
+      const cleanSymptom = {
+        ...symptom,
+        id: new Date().toISOString(),
+        symptom: typeof symptom.symptom === 'string' ? symptom.symptom.trim() : '',
+        comment: typeof symptom.comment === 'string' ? symptom.comment.trim() : '',
+        time: typeof symptom.time === 'string' ? symptom.time.trim() : '',
+        date: typeof symptom.date === 'string' ? symptom.date.trim() : '',
+        severity: ['low', 'medium', 'high'].includes(symptom.severity) ? symptom.severity : 'low'
+      };
+      
+      // Проверяем, что все обязательные поля заполнены
+      if (!cleanSymptom.symptom || !cleanSymptom.date || !cleanSymptom.time) {
+        console.error('Попытка добавить симптом с неполными данными:', cleanSymptom);
+        return;
+      }
+      
+      setSymptoms([...symptoms, cleanSymptom]);
+      console.log('Симптом успешно добавлен:', cleanSymptom);
+    } catch (error) {
+      console.error('Ошибка при добавлении симптома:', error);
+    }
   };
 
   const addAIMessage = (message: AIMessage) => {
