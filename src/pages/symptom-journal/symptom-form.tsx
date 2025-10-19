@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -22,9 +23,10 @@ const symptomSchema = z.object({
 
 interface SymptomFormProps {
   setFormOpen: (open: boolean) => void;
+  selectedDate: Date;
 }
 
-export function SymptomForm({ setFormOpen }: SymptomFormProps) {
+export function SymptomForm({ setFormOpen, selectedDate }: SymptomFormProps) {
   const { addSymptom } = useAppData();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -41,15 +43,19 @@ export function SymptomForm({ setFormOpen }: SymptomFormProps) {
   const onSubmit = async (values: z.infer<typeof symptomSchema>) => {
     setIsSubmitting(true);
     
+    console.log('Form values:', values); // Отладочная информация
+    
     const newSymptom = {
       id: new Date().toISOString(),
-      date: new Date().toISOString().split('T')[0],
+      date: format(selectedDate, 'yyyy-MM-dd'),
       symptom: values.symptom,
       severity: values.severity,
       time: values.time,
       comment: values.comment || "",
     };
 
+    console.log('New symptom:', newSymptom); // Отладочная информация
+    
     addSymptom(newSymptom);
     setFormOpen(false);
     form.reset();
@@ -95,6 +101,7 @@ export function SymptomForm({ setFormOpen }: SymptomFormProps) {
             </FormItem>
           )}
         />
+
 
         <FormField
           control={form.control}

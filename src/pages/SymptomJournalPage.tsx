@@ -21,7 +21,7 @@ export default function SymptomJournalPage() {
   const { symptoms, userData } = useAppData();
 
   const symptomsForSelectedDate = symptoms.filter(
-    (symptom) => format(new Date(symptom.date), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
+    (symptom) => symptom.date === format(selectedDate, 'yyyy-MM-dd')
   ).sort((a, b) => a.time.localeCompare(b.time));
 
   const handleExport = () => {
@@ -52,10 +52,10 @@ export default function SymptomJournalPage() {
                     <DialogHeader>
                         <DialogTitle>Добавить запись о симптоме</DialogTitle>
                         <DialogDescription>
-                            Опишите ваше самочувствие как можно точнее.
+                            Опишите ваше самочувствие как можно точнее для {format(selectedDate, 'd MMMM yyyy', { locale: ru })}.
                         </DialogDescription>
                     </DialogHeader>
-                    <SymptomForm setFormOpen={setIsFormOpen} />
+                    <SymptomForm setFormOpen={setIsFormOpen} selectedDate={selectedDate} />
                 </DialogContent>
             </Dialog>
         </div>

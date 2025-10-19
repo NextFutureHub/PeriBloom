@@ -19,7 +19,11 @@ interface SymptomCalendarProps {
 export default function SymptomCalendar({ selectedDate, setSelectedDate, symptoms }: SymptomCalendarProps) {
   const getSymptomCountForDate = (date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    return symptoms.filter(symptom => symptom.date === dateStr).length;
+    const count = symptoms.filter(symptom => symptom.date === dateStr).length;
+    if (count > 0) {
+      console.log(`Date ${dateStr} has ${count} symptoms:`, symptoms.filter(symptom => symptom.date === dateStr));
+    }
+    return count;
   };
 
   const getSeverityForDate = (date: Date) => {
@@ -43,15 +47,24 @@ export default function SymptomCalendar({ selectedDate, setSelectedDate, symptom
         onSelect={(date) => date && setSelectedDate(date)}
         className="rounded-md border"
         components={{
-          Day: ({ date, displayMonth }) => {
+          Day: ({ date, displayMonth, ...props }) => {
             const symptomCount = getSymptomCountForDate(date);
             const severity = getSeverityForDate(date);
+            const isSelected = selectedDate && 
+              date.getDate() === selectedDate.getDate() && 
+              date.getMonth() === selectedDate.getMonth() && 
+              date.getFullYear() === selectedDate.getFullYear();
             
             return (
-              <div className="relative">
-                <div className="flex h-9 w-9 items-center justify-center p-0 text-sm font-normal">
-                  {date.getDate()}
-                </div>
+              <button
+                {...props}
+                className={cn(
+                  "relative flex h-9 w-9 items-center justify-center p-0 text-sm font-normal hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none",
+                  isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
+                )}
+                onClick={() => setSelectedDate(date)}
+              >
+                {date.getDate()}
                 {symptomCount > 0 && (
                   <div className="absolute -bottom-1 -right-1">
                     <Badge 
@@ -65,7 +78,7 @@ export default function SymptomCalendar({ selectedDate, setSelectedDate, symptom
                     </Badge>
                   </div>
                 )}
-              </div>
+              </button>
             );
           }
         }}
