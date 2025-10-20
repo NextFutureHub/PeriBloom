@@ -196,8 +196,9 @@ export default function AIHealthPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex flex-col space-y-4">
-      <div className="flex items-center justify-between flex-shrink-0">
+    <div className="h-[calc(100vh-8rem)] flex flex-col">
+      {/* Зафиксированный заголовок */}
+      <div className="flex items-center justify-between flex-shrink-0 p-4 border-b">
         <div>
           <h2 className="text-2xl font-semibold font-headline">{t('aiHealth.title')}</h2>
           <p className="text-muted-foreground">{t('aiHealth.subtitle')}</p>
@@ -210,23 +211,31 @@ export default function AIHealthPage() {
         )}
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="chat" className="flex items-center gap-2">
-            <MessageCircle className="h-4 w-4" />
-            {t('aiHealth.chat.title')}
-          </TabsTrigger>
-          <TabsTrigger value="triage" className="flex items-center gap-2">
-            <HeartPulse className="h-4 w-4" />
-            {t('aiHealth.triage.title')}
-          </TabsTrigger>
-        </TabsList>
+      {/* Зафиксированные вкладки */}
+      <div className="flex-shrink-0 p-4 border-b">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="chat" className="flex items-center gap-2">
+              <MessageCircle className="h-4 w-4" />
+              {t('aiHealth.chat.title')}
+            </TabsTrigger>
+            <TabsTrigger value="triage" className="flex items-center gap-2">
+              <HeartPulse className="h-4 w-4" />
+              {t('aiHealth.triage.title')}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
-        <TabsContent value="chat" className="flex-1">
-          <Card className="h-full">
-            <CardContent className="p-0 flex flex-col">
-              <ScrollArea className="flex-1 rounded-md border p-4" ref={scrollAreaRef}>
-                <div className="space-y-6">
+      {/* Основной контент с прокруткой */}
+      <div className="flex-1 overflow-hidden">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
+
+          <TabsContent value="chat" className="h-full flex flex-col">
+            {/* Область чата с прокруткой - только белый блок с сообщениями */}
+            <div className="flex-1 overflow-hidden">
+              <ScrollArea className="h-full" ref={scrollAreaRef}>
+                <div className="p-4 space-y-6">
                   {aiMessages.map((message) => (
                     <div
                       key={message.id}
@@ -277,77 +286,79 @@ export default function AIHealthPage() {
                   )}
                 </div>
               </ScrollArea>
+            </div>
 
-              <div className="p-4 border-t flex-shrink-0">
-                <Form {...chatForm}>
-                  <form onSubmit={chatForm.handleSubmit(onChatSubmit)} className="flex items-center gap-2">
-                    <FormField
-                      control={chatForm.control}
-                      name="query"
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormControl>
-                            <Input placeholder={t('aiHealth.chat.placeholder')} {...field} disabled={isThinking} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <Button type="submit" size="icon" disabled={isThinking}>
-                      <Send className="h-5 w-5" />
-                    </Button>
-                  </form>
-                </Form>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="triage" className="flex-1">
-          <Card className="h-full">
-            <CardHeader>
-            <CardTitle>{t('aiHealth.triage.title')}</CardTitle>
-            <CardDescription>{t('aiHealth.triage.subtitle')}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col h-full">
-              <Form {...triageForm}>
-                <form onSubmit={triageForm.handleSubmit(onTriageSubmit)} className="space-y-6">
+            {/* Фиксированная форма ввода */}
+            <div className="p-4 border-t flex-shrink-0 bg-background">
+              <Form {...chatForm}>
+                <form onSubmit={chatForm.handleSubmit(onChatSubmit)} className="flex items-center gap-2">
                   <FormField
-                    control={triageForm.control}
-                    name="symptomsDescription"
+                    control={chatForm.control}
+                    name="query"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex-1">
                         <FormControl>
-                          <Textarea
-                            rows={4}
-                            placeholder={t('aiHealth.triage.placeholder')}
-                            {...field}
-                          />
+                          <Input placeholder={t('aiHealth.chat.placeholder')} {...field} disabled={isThinking} />
                         </FormControl>
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" disabled={isAnalyzing}>
-                    {isAnalyzing ? t('aiHealth.triage.analyzing') : t('aiHealth.triage.analyze')}
+                  <Button type="submit" size="icon" disabled={isThinking}>
+                    <Send className="h-5 w-5" />
                   </Button>
                 </form>
               </Form>
+            </div>
+          </TabsContent>
 
-              <div className="flex-1 overflow-auto">
-                {isAnalyzing && (
-                  <div className="mt-6 space-y-4">
-                      <Skeleton className="h-8 w-1/3" />
-                      <Skeleton className="h-20 w-full" />
-                  </div>
-                )}
-
-                {error && <p className="mt-4 text-destructive">{error}</p>}
+          <TabsContent value="triage" className="h-full flex flex-col">
+            <div className="flex-1 overflow-hidden">
+              <div className="h-full p-4">
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold">{t('aiHealth.triage.title')}</h3>
+                  <p className="text-muted-foreground">{t('aiHealth.triage.subtitle')}</p>
+                </div>
                 
-                {analysisResult && <RiskResult result={analysisResult} />}
+                <Form {...triageForm}>
+                  <form onSubmit={triageForm.handleSubmit(onTriageSubmit)} className="space-y-6">
+                    <FormField
+                      control={triageForm.control}
+                      name="symptomsDescription"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Textarea
+                              rows={4}
+                              placeholder={t('aiHealth.triage.placeholder')}
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" disabled={isAnalyzing}>
+                      {isAnalyzing ? t('aiHealth.triage.analyzing') : t('aiHealth.triage.analyze')}
+                    </Button>
+                  </form>
+                </Form>
+
+                <div className="mt-6">
+                  {isAnalyzing && (
+                    <div className="mt-6 space-y-4">
+                        <Skeleton className="h-8 w-1/3" />
+                        <Skeleton className="h-20 w-full" />
+                    </div>
+                  )}
+
+                  {error && <p className="mt-4 text-destructive">{error}</p>}
+                  
+                  {analysisResult && <RiskResult result={analysisResult} />}
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }
