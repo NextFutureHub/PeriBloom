@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Brain } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
@@ -14,11 +14,13 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { generateSymptomReport } from './symptom-journal/pdf-export';
+import { useNavigate } from 'react-router-dom';
 
 export default function SymptomJournalPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { symptoms, userData } = useAppData();
+  const navigate = useNavigate();
 
   const symptomsForSelectedDate = symptoms.filter(
     (symptom) => symptom.date === format(selectedDate, 'yyyy-MM-dd')
@@ -41,6 +43,16 @@ export default function SymptomJournalPage() {
           <Button variant="outline" onClick={handleExport} disabled={symptoms.length === 0} className="w-full sm:w-auto">
             Экспорт в PDF
           </Button>
+          {symptomsForSelectedDate.length > 0 && (
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/app/ai-health?tab=triage')} 
+              className="w-full sm:w-auto"
+            >
+              <Brain className="mr-2 h-4 w-4" />
+              Анализировать симптомы
+            </Button>
+          )}
           <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
             <DialogTrigger asChild>
               <Button className="w-full sm:w-auto">

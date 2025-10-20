@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAppData } from '@/hooks/use-app-data';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,11 @@ import PregnancySky from '@/components/PregnancySky';
 export default function DashboardPage() {
   const { userData } = useAppData();
   const [showElements, setShowElements] = useState(true);
+  const [showAllActions, setShowAllActions] = useState(false);
+  const [isMeditationMode, setIsMeditationMode] = useState(false);
+  const [inactivityTimer, setInactivityTimer] = useState<NodeJS.Timeout | null>(null);
+  const [showMeditationWarning, setShowMeditationWarning] = useState(false);
+  const [warningTimer, setWarningTimer] = useState<NodeJS.Timeout | null>(null);
 
   const getStatus = () => {
     if (!userData) return { title: '', value: '' };
@@ -53,20 +58,80 @@ export default function DashboardPage() {
 
   const currentWeek = getCurrentWeek();
 
+  // Автоматический режим покоя через 5 минут неактивности
+  const resetInactivityTimer = () => {
+    if (inactivityTimer) {
+      clearTimeout(inactivityTimer);
+    }
+    if (warningTimer) {
+      clearTimeout(warningTimer);
+    }
+    
+    // Предупреждение за 30 секунд до перехода в режим покоя
+    const newWarningTimer = setTimeout(() => {
+      setShowMeditationWarning(true);
+    }, 4.5 * 60 * 1000); // 4.5 минуты
+    
+    // Переход в режим покоя через 5 минут
+    const newTimer = setTimeout(() => {
+      setIsMeditationMode(true);
+      setShowElements(false);
+      setShowMeditationWarning(false);
+    }, 5 * 60 * 1000); // 5 минут
+    
+    setWarningTimer(newWarningTimer);
+    setInactivityTimer(newTimer);
+  };
+
+  const handleUserActivity = () => {
+    if (isMeditationMode) {
+      setIsMeditationMode(false);
+      setShowElements(true);
+    }
+    if (showMeditationWarning) {
+      setShowMeditationWarning(false);
+    }
+    resetInactivityTimer();
+  };
+
   const handleBackgroundClick = (e: React.MouseEvent) => {
     // Клик только на фон, не на элементы
     if (e.target === e.currentTarget) {
       setShowElements(!showElements);
     }
+    handleUserActivity();
   };
+
+  // Добавляем обработчики активности
+  React.useEffect(() => {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    
+    events.forEach(event => {
+      document.addEventListener(event, handleUserActivity, true);
+    });
+    
+    resetInactivityTimer();
+    
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, handleUserActivity, true);
+      });
+      if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+      }
+      if (warningTimer) {
+        clearTimeout(warningTimer);
+      }
+    };
+  }, []);
 
   return (
     <div className="relative min-h-screen" onClick={handleBackgroundClick}>
       {/* 3D фон */}
       <PregnancySky 
         currentWeek={currentWeek} 
-        maxStars={1000} 
-        animate={true} 
+        maxStars={isMeditationMode ? 200 : 1000} 
+        animate={!isMeditationMode} 
       />
       
       {/* Кнопка переключения видимости */}
@@ -85,12 +150,31 @@ export default function DashboardPage() {
         </Button>
       </div>
       
+      {/* Предупреждение о переходе в режим покоя */}
+      {showMeditationWarning && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
+          <div className="bg-orange-50 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-orange-200 text-center animate-pulse">
+            <h3 className="text-lg font-bold text-orange-800 mb-1">⏰ Скоро режим покоя</h3>
+            <p className="text-sm text-orange-600">
+              Через 30 секунд интерфейс скроется для медитации. Коснитесь экрана, чтобы остаться активным.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Подсказка когда элементы скрыты */}
       {!showElements && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
           <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/20 text-center">
-            <h3 className="text-lg font-bold text-gray-800 mb-1">🌟 Режим медитации</h3>
-            <p className="text-sm text-gray-600">Наслаждайтесь звёздным небом и бьющимся сердцем</p>
+            <h3 className="text-lg font-bold text-gray-800 mb-1">
+              {isMeditationMode ? "🧘 Режим покоя" : "🌟 Режим медитации"}
+            </h3>
+            <p className="text-sm text-gray-600">
+              {isMeditationMode 
+                ? "Коснитесь экрана для возврата к интерфейсу" 
+                : "Наслаждайтесь звёздным небом и бьющимся сердцем"
+              }
+            </p>
           </div>
         </div>
       )}
@@ -145,8 +229,9 @@ export default function DashboardPage() {
             Быстрые действия
           </h2>
           
-          <div className="grid gap-6 md:grid-cols-3">
-            <Link to="/app/symptom-journal">
+          <div className="flex flex-col items-center space-y-4">
+            {/* Основная карточка - всегда видна */}
+            <Link to="/app/symptom-journal" className="w-full max-w-sm">
               <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
                 <CardHeader className="text-center">
                   <div className="mx-auto mb-4 p-4 bg-pink-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-pink-200 transition-colors">
@@ -159,34 +244,61 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </Link>
-            
-            <Link to="/app/ai-assistant">
-              <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
-                <CardHeader className="text-center">
-                  <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                    <Bot className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <CardTitle className="text-xl font-bold text-gray-800">AI-ассистент</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-muted-foreground">Задайте вопрос и получите персональный совет.</p>
-                </CardContent>
-              </Card>
-            </Link>
-            
-            <Link to="/app/triage">
-              <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
-                <CardHeader className="text-center">
-                  <div className="mx-auto mb-4 p-4 bg-red-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-red-200 transition-colors">
-                    <HeartPulse className="h-8 w-8 text-red-600" />
-                  </div>
-                  <CardTitle className="text-xl font-bold text-gray-800">Triage-анализ</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-muted-foreground">Оцените свои симптомы с помощью AI.</p>
-                </CardContent>
-              </Card>
-            </Link>
+
+            {/* Кнопка показать больше */}
+            {!showAllActions && (
+              <Button 
+                variant="outline" 
+                onClick={() => setShowAllActions(true)}
+                className="bg-white/90 backdrop-blur-md border-white/20 hover:bg-white/95"
+              >
+                Показать больше действий
+              </Button>
+            )}
+
+            {/* Дополнительные карточки */}
+            {showAllActions && (
+              <div className="grid gap-6 md:grid-cols-2 w-full max-w-4xl">
+                <Link to="/app/ai-assistant">
+                  <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+                    <CardHeader className="text-center">
+                      <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                        <Bot className="h-8 w-8 text-blue-600" />
+                      </div>
+                      <CardTitle className="text-xl font-bold text-gray-800">AI-ассистент</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-center">
+                      <p className="text-muted-foreground">Задайте вопрос и получите персональный совет.</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+                
+                <Link to="/app/triage">
+                  <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+                    <CardHeader className="text-center">
+                      <div className="mx-auto mb-4 p-4 bg-red-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                        <HeartPulse className="h-8 w-8 text-red-600" />
+                      </div>
+                      <CardTitle className="text-xl font-bold text-gray-800">Triage-анализ</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-center">
+                      <p className="text-muted-foreground">Оцените свои симптомы с помощью AI.</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </div>
+            )}
+
+            {/* Кнопка скрыть */}
+            {showAllActions && (
+              <Button 
+                variant="ghost" 
+                onClick={() => setShowAllActions(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Скрыть дополнительные действия
+              </Button>
+            )}
           </div>
         </div>
       </div>

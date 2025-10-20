@@ -6,12 +6,14 @@ import { Thermometer, Waves, Ear, Wifi, WifiOff, AlertTriangle } from 'lucide-re
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useSoftNotification } from '@/components/ui/soft-notification';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 export default function IoTMonitorPage() {
   const [isSupported, setIsSupported] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const { showNotification, NotificationContainer } = useSoftNotification();
   const [deviceData, setDeviceData] = useState({ 
     temp: 'N/A', 
     humidity: 'N/A', 
@@ -125,6 +127,7 @@ export default function IoTMonitorPage() {
       setIsDisconnecting(false);
       setError('');
       localStorage.setItem('iot-device-connected', 'true');
+      showNotification('Устройство успешно подключено', 'success');
 
       const textDecoder = new TextDecoderStream();
       newPort.readable.pipeTo(textDecoder.writable);
@@ -256,6 +259,7 @@ export default function IoTMonitorPage() {
     localStorage.removeItem('iot-device-connected');
 
     console.log('✅ Устройство корректно отключено');
+    showNotification('Устройство отключено', 'info');
 
     setTimeout(() => {
       setIsDisconnecting(false);
@@ -308,6 +312,7 @@ export default function IoTMonitorPage() {
     localStorage.removeItem('iot-device-connected');
     
     console.log('✅ Принудительное отключение завершено');
+    showNotification('Принудительное отключение выполнено', 'info');
   };
   
   const getClimateStatus = () => {
@@ -577,6 +582,9 @@ export default function IoTMonitorPage() {
                 )}
             </CardContent>
         </Card>
+        
+        {/* Мягкие уведомления */}
+        <NotificationContainer />
     </div>
   );
 }
