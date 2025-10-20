@@ -123,15 +123,6 @@
       "followUpAdvice": "Әрі қарай кеңестер"
     }
   },
-  "settings": {
-    "title": "Баптаулар",
-    "personalInfo": "Жеке ақпарат",
-    "language": "Тіл",
-    "theme": "Тақырып",
-    "notifications": "Хабарландырулар",
-    "privacy": "Құпиялылық",
-    "about": "Қолданба туралы"
-  },
   "lifecycleStages": {
     "pregnancy": "Жүктілік",
     "postpartum": "Туғаннан кейінгі кезең",

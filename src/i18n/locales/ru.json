@@ -123,15 +123,6 @@
       "followUpAdvice": "Дальнейшие советы"
     }
   },
-  "settings": {
-    "title": "Настройки",
-    "personalInfo": "Личная информация",
-    "language": "Язык",
-    "theme": "Тема",
-    "notifications": "Уведомления",
-    "privacy": "Конфиденциальность",
-    "about": "О приложении"
-  },
   "lifecycleStages": {
     "pregnancy": "Беременность",
     "postpartum": "Послеродовой период",
