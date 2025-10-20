@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { useAppData } from '@/hooks/use-app-data';
+import { useTranslation } from '@/hooks/use-translation';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Bot, BookHeart, HeartPulse, Eye, EyeOff } from 'lucide-react';
+import { ArrowRight, Bot, BookHeart, Eye, EyeOff } from 'lucide-react';
 import { differenceInWeeks, differenceInMonths, differenceInDays } from 'date-fns';
 import { Link } from 'react-router-dom';
 import PregnancySky from '@/components/PregnancySky';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 export default function DashboardPage() {
   const { userData } = useAppData();
+  const { t } = useTranslation();
   const [showElements, setShowElements] = useState(true);
   const [showAllActions, setShowAllActions] = useState(false);
   const [isMeditationMode, setIsMeditationMode] = useState(false);
@@ -134,8 +137,9 @@ export default function DashboardPage() {
         animate={!isMeditationMode} 
       />
       
-      {/* Кнопка переключения видимости */}
-      <div className="absolute top-4 right-4 z-30">
+      {/* Кнопка переключения видимости и переключатель языка */}
+      <div className="absolute top-4 right-4 z-30 flex gap-2">
+        <LanguageSwitcher />
         <Button
           variant="outline"
           size="sm"
@@ -146,7 +150,7 @@ export default function DashboardPage() {
           className="bg-white/90 backdrop-blur-md border-white/20 hover:bg-white/95"
         >
           {showElements ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          <span className="ml-2">{showElements ? 'Скрыть' : 'Показать'}</span>
+          <span className="ml-2">{showElements ? t('dashboard.hide') : t('dashboard.show')}</span>
         </Button>
       </div>
       
@@ -154,9 +158,9 @@ export default function DashboardPage() {
       {showMeditationWarning && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
           <div className="bg-orange-50 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-orange-200 text-center animate-pulse">
-            <h3 className="text-lg font-bold text-orange-800 mb-1">⏰ Скоро режим покоя</h3>
+            <h3 className="text-lg font-bold text-orange-800 mb-1">{t('dashboard.meditationWarning')}</h3>
             <p className="text-sm text-orange-600">
-              Через 30 секунд интерфейс скроется для медитации. Коснитесь экрана, чтобы остаться активным.
+              {t('dashboard.meditationWarningDesc')}
             </p>
           </div>
         </div>
@@ -167,12 +171,12 @@ export default function DashboardPage() {
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
           <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/20 text-center">
             <h3 className="text-lg font-bold text-gray-800 mb-1">
-              {isMeditationMode ? "🧘 Режим покоя" : "🌟 Режим медитации"}
+              {isMeditationMode ? t('dashboard.meditationMode') : t('dashboard.meditationModeActive')}
             </h3>
             <p className="text-sm text-gray-600">
-              {isMeditationMode 
-                ? "Коснитесь экрана для возврата к интерфейсу" 
-                : "Наслаждайтесь звёздным небом и бьющимся сердцем"
+              {isMeditationMode
+                ? t('dashboard.meditationModeDesc')
+                : t('dashboard.meditationModeActiveDesc')
               }
             </p>
           </div>
@@ -185,9 +189,9 @@ export default function DashboardPage() {
         <div className="bg-white/90 backdrop-blur-md rounded-2xl p-8 m-6 shadow-2xl border border-white/20">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold font-headline bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Добро пожаловать, {userData?.name}!
+              {t('dashboard.welcome', { name: userData?.name })}
             </h1>
-            <p className="text-lg text-muted-foreground">Готовы помочь вам на каждом шагу вашего пути</p>
+            <p className="text-lg text-muted-foreground">{t('dashboard.subtitle')}</p>
           </div>
         </div>
 
@@ -209,25 +213,24 @@ export default function DashboardPage() {
           {/* Карточка рекомендации */}
           <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 md:col-span-2">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-green-600">💡 Рекомендация дня</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                Не забывайте пить достаточно воды в течение дня. Гидратация важна для вас и вашего малыша. 
-                Попробуйте выпивать не менее 8 стаканов воды.
-              </p>
-              <Button variant="link" className="px-0 mt-4 text-green-600 hover:text-green-700">
-                Узнать больше <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+                    <CardTitle className="text-2xl font-bold text-green-600">{t('dashboard.recommendation')}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-lg leading-relaxed">
+                      {t('dashboard.recommendationText')}
+                    </p>
+                    <Button variant="link" className="px-0 mt-4 text-green-600 hover:text-green-700">
+                      {t('dashboard.learnMore')} <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
             </CardContent>
           </Card>
         </div>
 
         {/* Быстрые действия */}
         <div className="px-6 mt-8">
-          <h2 className="text-3xl font-bold font-headline text-center mb-8 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Быстрые действия
-          </h2>
+        <h2 className="text-3xl font-bold font-headline text-center mb-8 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          {t('dashboard.quickActions')}
+        </h2>
           
           <div className="flex flex-col items-center space-y-4">
             {/* Основная карточка - всегда видна */}
@@ -237,22 +240,22 @@ export default function DashboardPage() {
                   <div className="mx-auto mb-4 p-4 bg-pink-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-pink-200 transition-colors">
                     <BookHeart className="h-8 w-8 text-pink-600" />
                   </div>
-                  <CardTitle className="text-xl font-bold text-gray-800">Добавить симптом</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-muted-foreground">Запишите свое самочувствие, чтобы отслеживать изменения.</p>
+                        <CardTitle className="text-xl font-bold text-gray-800">{t('dashboard.addSymptom')}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-center">
+                        <p className="text-muted-foreground">{t('dashboard.addSymptomDesc')}</p>
                 </CardContent>
               </Card>
             </Link>
 
             {/* Кнопка показать больше */}
             {!showAllActions && (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setShowAllActions(true)}
                 className="bg-white/90 backdrop-blur-md border-white/20 hover:bg-white/95"
               >
-                Показать больше действий
+                {t('dashboard.showMore')}
               </Button>
             )}
 
@@ -265,10 +268,10 @@ export default function DashboardPage() {
                   <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
                     <Bot className="h-8 w-8 text-blue-600" />
                   </div>
-                  <CardTitle className="text-xl font-bold text-gray-800">AI Медпомощник</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-muted-foreground">Побеседуйте с AI или проанализируйте симптомы.</p>
+                        <CardTitle className="text-xl font-bold text-gray-800">{t('dashboard.aiAssistant')}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-center">
+                        <p className="text-muted-foreground">{t('dashboard.aiAssistantDesc')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -277,12 +280,12 @@ export default function DashboardPage() {
 
             {/* Кнопка скрыть */}
             {showAllActions && (
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 onClick={() => setShowAllActions(false)}
                 className="text-muted-foreground hover:text-foreground"
               >
-                Скрыть дополнительные действия
+                {t('dashboard.showLess')}
               </Button>
             )}
           </div>

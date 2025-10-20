@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAppData } from "@/hooks/use-app-data";
+import { useTranslation } from "@/hooks/use-translation";
 
 const symptomSchema = z.object({
   symptom: z.string()
@@ -32,6 +33,7 @@ interface SymptomFormProps {
 
 export function SymptomForm({ setFormOpen, selectedDate }: SymptomFormProps) {
   const { addSymptom } = useAppData();
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof symptomSchema>>({
@@ -93,16 +95,16 @@ export function SymptomForm({ setFormOpen, selectedDate }: SymptomFormProps) {
           name="symptom"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Симптом</FormLabel>
+              <FormLabel>{t('symptomForm.symptom')}</FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="Опишите ваш симптом..." 
+                  placeholder={t('symptomForm.symptomPlaceholder')} 
                   {...field} 
                   maxLength={500}
                 />
               </FormControl>
               <div className="text-sm text-muted-foreground">
-                {field.value?.length || 0}/500 символов
+                {field.value?.length || 0}/500 {t('symptomForm.characters')}
               </div>
               <FormMessage />
             </FormItem>
@@ -114,17 +116,17 @@ export function SymptomForm({ setFormOpen, selectedDate }: SymptomFormProps) {
           name="severity"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Степень тяжести</FormLabel>
+              <FormLabel>{t('symptomForm.severity')}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Выберите степень тяжести" />
+                    <SelectValue placeholder={t('symptomForm.severity')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="low">Низкая</SelectItem>
-                  <SelectItem value="medium">Средняя</SelectItem>
-                  <SelectItem value="high">Высокая</SelectItem>
+                  <SelectItem value="low">{t('symptomForm.severityLow')}</SelectItem>
+                  <SelectItem value="medium">{t('symptomForm.severityMedium')}</SelectItem>
+                  <SelectItem value="high">{t('symptomForm.severityHigh')}</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -138,7 +140,7 @@ export function SymptomForm({ setFormOpen, selectedDate }: SymptomFormProps) {
           name="time"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Время</FormLabel>
+              <FormLabel>{t('symptomForm.time')}</FormLabel>
               <FormControl>
                 <Input type="time" {...field} />
               </FormControl>
@@ -152,17 +154,17 @@ export function SymptomForm({ setFormOpen, selectedDate }: SymptomFormProps) {
           name="comment"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Комментарий (необязательно)</FormLabel>
+              <FormLabel>{t('symptomForm.comment')}</FormLabel>
               <FormControl>
                 <Textarea 
-                  placeholder="Дополнительные детали..." 
+                  placeholder={t('symptomForm.commentPlaceholder')} 
                   {...field} 
                   className="min-h-[80px]"
                   maxLength={1000}
                 />
               </FormControl>
               <div className="text-sm text-muted-foreground">
-                {field.value?.length || 0}/1000 символов
+                {field.value?.length || 0}/1000 {t('symptomForm.characters')}
               </div>
               <FormMessage />
             </FormItem>
@@ -171,10 +173,10 @@ export function SymptomForm({ setFormOpen, selectedDate }: SymptomFormProps) {
 
         <div className="flex justify-end space-x-2">
           <Button type="button" variant="outline" onClick={() => setFormOpen(false)}>
-            Отмена
+            {t('common.cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Добавление..." : "Добавить запись"}
+            {isSubmitting ? t('common.loading') : t('symptomForm.submit')}
           </Button>
         </div>
       </form>

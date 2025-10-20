@@ -8,6 +8,7 @@ import { ru } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useAppData } from '@/hooks/use-app-data';
+import { useTranslation } from '@/hooks/use-translation';
 import SymptomCalendar from './symptom-journal/symptom-calendar';
 import { SymptomForm } from './symptom-journal/symptom-form';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -20,6 +21,7 @@ export default function SymptomJournalPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { symptoms, userData } = useAppData();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const symptomsForSelectedDate = symptoms.filter(
@@ -35,36 +37,36 @@ export default function SymptomJournalPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="space-y-1">
-            <h2 className="text-2xl font-semibold font-headline">Журнал симптомов</h2>
-            <p className="text-muted-foreground">Отслеживайте свое самочувствие день за днем.</p>
-        </div>
+            <div className="space-y-1">
+                <h2 className="text-2xl font-semibold font-headline">{t('symptomJournal.title')}</h2>
+                <p className="text-muted-foreground">{t('symptomJournal.subtitle')}</p>
+            </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <Button variant="outline" onClick={handleExport} disabled={symptoms.length === 0} className="w-full sm:w-auto">
-            Экспорт в PDF
+            {t('symptomJournal.exportPdf')}
           </Button>
           {symptomsForSelectedDate.length > 0 && (
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/app/ai-health?tab=triage')} 
+            <Button
+              variant="outline"
+              onClick={() => navigate('/app/ai-health?tab=triage')}
               className="w-full sm:w-auto"
             >
               <Brain className="mr-2 h-4 w-4" />
-              Анализировать симптомы
+              {t('symptomJournal.analyzeSymptoms')}
             </Button>
           )}
           <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
             <DialogTrigger asChild>
               <Button className="w-full sm:w-auto">
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Добавить запись
+                {t('symptomJournal.addEntry')}
               </Button>
             </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Добавить запись о симптоме</DialogTitle>
+                        <DialogTitle>{t('symptomJournal.addEntryTitle')}</DialogTitle>
                         <DialogDescription>
-                            Опишите ваше самочувствие как можно точнее для {format(selectedDate, 'd MMMM yyyy', { locale: ru })}.
+                            {t('symptomJournal.addEntryDesc', { date: format(selectedDate, 'd MMMM yyyy', { locale: ru }) })}
                         </DialogDescription>
                     </DialogHeader>
                     <SymptomForm setFormOpen={setIsFormOpen} selectedDate={selectedDate} />
@@ -88,9 +90,9 @@ export default function SymptomJournalPage() {
         <div className="lg:col-span-2">
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>
-                Записи за {format(selectedDate, 'd MMMM yyyy', { locale: ru })}
-              </CardTitle>
+                <CardTitle>
+                  {t('symptomJournal.entriesFor', { date: format(selectedDate, 'd MMMM yyyy', { locale: ru }) })}
+                </CardTitle>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[450px]">
@@ -103,10 +105,10 @@ export default function SymptomJournalPage() {
                             <p className="font-semibold">{symptom.symptom}</p>
                             <p className="text-sm text-muted-foreground">{symptom.time}</p>
                           </div>
-                          <Badge variant={symptom.severity === 'high' ? 'destructive' : symptom.severity === 'medium' ? 'secondary' : 'default'}
-                            className={symptom.severity === 'medium' ? 'bg-yellow-200 text-yellow-800' : ''}>
-                            {symptom.severity === 'low' ? 'Низкая' : symptom.severity === 'medium' ? 'Средняя' : 'Высокая'}
-                          </Badge>
+                  <Badge variant={symptom.severity === 'high' ? 'destructive' : symptom.severity === 'medium' ? 'secondary' : 'default'}
+                    className={symptom.severity === 'medium' ? 'bg-yellow-200 text-yellow-800' : ''}>
+                    {symptom.severity === 'low' ? t('symptomJournal.severity.low') : symptom.severity === 'medium' ? t('symptomJournal.severity.medium') : t('symptomJournal.severity.high')}
+                  </Badge>
                         </div>
                         {symptom.comment && (
                           <p className="mt-2 text-sm text-muted-foreground italic">"{symptom.comment}"</p>
@@ -116,8 +118,8 @@ export default function SymptomJournalPage() {
                   </div>
                 ) : (
                   <div className="flex h-[400px] flex-col items-center justify-center text-center text-muted-foreground">
-                    <p>Нет записей за эту дату.</p>
-                    <p className="text-sm">Выберите другую дату или добавьте новую запись.</p>
+                    <p>{t('symptomJournal.noEntries')}</p>
+                    <p className="text-sm">{t('symptomJournal.noEntriesDesc')}</p>
                   </div>
                 )}
               </ScrollArea>

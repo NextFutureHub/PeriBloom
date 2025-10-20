@@ -8,6 +8,7 @@ import * as z from 'zod';
 import { Bot, HeartPulse, MessageCircle, Send, Trash2 } from 'lucide-react';
 
 import { useAppData } from '@/hooks/use-app-data';
+import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
@@ -81,6 +82,7 @@ const RiskResult = ({ result }: { result: AnalyzeSymptomsOutput }) => {
 
 export default function AIHealthPage() {
   const { userData, aiMessages, addAIMessage, clearAIChat } = useAppData();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('chat');
   const [isThinking, setIsThinking] = useState(false);
@@ -197,13 +199,13 @@ export default function AIHealthPage() {
     <div className="h-[calc(100vh-8rem)] flex flex-col space-y-4">
       <div className="flex items-center justify-between flex-shrink-0">
         <div>
-          <h2 className="text-2xl font-semibold font-headline">AI Медпомощник</h2>
-          <p className="text-muted-foreground">Персональный помощник для вашего здоровья</p>
+          <h2 className="text-2xl font-semibold font-headline">{t('aiHealth.title')}</h2>
+          <p className="text-muted-foreground">{t('aiHealth.subtitle')}</p>
         </div>
         {activeTab === 'chat' && (
           <Button variant="ghost" size="icon" onClick={clearAIChat} disabled={aiMessages.length === 0}>
               <Trash2 className="h-5 w-5"/>
-              <span className="sr-only">Очистить чат</span>
+              <span className="sr-only">{t('aiHealth.chat.clearChat')}</span>
           </Button>
         )}
       </div>
@@ -212,11 +214,11 @@ export default function AIHealthPage() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="chat" className="flex items-center gap-2">
             <MessageCircle className="h-4 w-4" />
-            Побеседовать
+            {t('aiHealth.chat.title')}
           </TabsTrigger>
           <TabsTrigger value="triage" className="flex items-center gap-2">
             <HeartPulse className="h-4 w-4" />
-            Проанализировать симптомы
+            {t('aiHealth.triage.title')}
           </TabsTrigger>
         </TabsList>
 
@@ -285,7 +287,7 @@ export default function AIHealthPage() {
                       render={({ field }) => (
                         <FormItem className="flex-1">
                           <FormControl>
-                            <Input placeholder="Спросите что-нибудь..." {...field} disabled={isThinking} />
+                            <Input placeholder={t('aiHealth.chat.placeholder')} {...field} disabled={isThinking} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -303,8 +305,8 @@ export default function AIHealthPage() {
         <TabsContent value="triage" className="flex-1">
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>AI Triage-анализ</CardTitle>
-              <CardDescription>Опишите ваши симптомы, и AI поможет оценить уровень риска и даст рекомендации.</CardDescription>
+            <CardTitle>{t('aiHealth.triage.title')}</CardTitle>
+            <CardDescription>{t('aiHealth.triage.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col h-full">
               <Form {...triageForm}>
@@ -317,7 +319,7 @@ export default function AIHealthPage() {
                         <FormControl>
                           <Textarea
                             rows={4}
-                            placeholder="Например: 'У меня сильная головная боль в области висков, тошнота и чувствительность к свету. Это продолжается уже 3 часа.'"
+                            placeholder={t('aiHealth.triage.placeholder')}
                             {...field}
                           />
                         </FormControl>
@@ -325,7 +327,7 @@ export default function AIHealthPage() {
                     )}
                   />
                   <Button type="submit" disabled={isAnalyzing}>
-                    {isAnalyzing ? 'Анализируем...' : 'Проанализировать'}
+                    {isAnalyzing ? t('aiHealth.triage.analyzing') : t('aiHealth.triage.analyze')}
                   </Button>
                 </form>
               </Form>

@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 import { useAppData } from '@/hooks/use-app-data';
+import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,7 @@ const onboardingSchema = z.object({
 export function Onboarding() {
   const navigate = useNavigate();
   const { setUserData } = useAppData();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const totalSteps = 3;
 
@@ -60,8 +62,8 @@ export function Onboarding() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
             <Sparkles className="h-8 w-8" />
           </div>
-          <CardTitle className="text-3xl font-headline">Добро пожаловать в PeriBloom</CardTitle>
-          <CardDescription>Ваш надежный партнер на пути материнства</CardDescription>
+                 <CardTitle className="text-3xl font-headline">{t('onboarding.title')}</CardTitle>
+                 <CardDescription>{t('onboarding.subtitle')}</CardDescription>
           
           {/* Индикатор прогресса */}
           <div className="flex justify-center mt-4 space-x-2">
@@ -74,27 +76,27 @@ export function Onboarding() {
               />
             ))}
           </div>
-          <p className="text-sm text-muted-foreground mt-2">
-            Шаг {step} из {totalSteps}
-          </p>
+                 <p className="text-sm text-muted-foreground mt-2">
+                   {t('onboarding.progress', { current: step, total: totalSteps })}
+                 </p>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {step === 1 && (
                 <div className="space-y-6">
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl font-semibold mb-2">Давайте знакомиться!</h3>
-                    <p className="text-muted-foreground">Как вас зовут?</p>
-                  </div>
+                         <div className="text-center mb-6">
+                           <h3 className="text-xl font-semibold mb-2">{t('onboarding.step1.title')}</h3>
+                           <p className="text-muted-foreground">{t('onboarding.step1.subtitle')}</p>
+                         </div>
                   <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Ваше имя</FormLabel>
+                        <FormLabel>{t('common.name')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Например, Мария" {...field} className="text-center text-lg" />
+                          <Input placeholder={t('onboarding.step1.placeholder')} {...field} className="text-center text-lg" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -105,10 +107,10 @@ export function Onboarding() {
 
               {step === 2 && (
                 <div className="space-y-6">
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl font-semibold mb-2">Какой у вас этап?</h3>
-                    <p className="text-muted-foreground">Выберите ваш текущий жизненный этап</p>
-                  </div>
+                         <div className="text-center mb-6">
+                           <h3 className="text-xl font-semibold mb-2">{t('onboarding.step2.title')}</h3>
+                           <p className="text-muted-foreground">{t('onboarding.step2.subtitle')}</p>
+                         </div>
                   <FormField
                     control={form.control}
                     name="lifecycleStage"
@@ -124,19 +126,19 @@ export function Onboarding() {
                               <FormControl>
                                 <RadioGroupItem value="pregnancy" />
                               </FormControl>
-                              <FormLabel className="font-normal text-base">🤰 Беременность</FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0 p-4 border rounded-lg hover:bg-accent/50 transition-colors">
-                              <FormControl>
-                                <RadioGroupItem value="postpartum" />
-                              </FormControl>
-                              <FormLabel className="font-normal text-base">👶 Послеродовой период</FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0 p-4 border rounded-lg hover:bg-accent/50 transition-colors">
-                              <FormControl>
-                                <RadioGroupItem value="childcare" />
-                              </FormControl>
-                              <FormLabel className="font-normal text-base">👨‍👩‍👧‍👦 Уход за ребенком</FormLabel>
+                                     <FormLabel className="font-normal text-base">{t('onboarding.step2.pregnancy')}</FormLabel>
+                                   </FormItem>
+                                   <FormItem className="flex items-center space-x-3 space-y-0 p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                                     <FormControl>
+                                       <RadioGroupItem value="postpartum" />
+                                     </FormControl>
+                                     <FormLabel className="font-normal text-base">{t('onboarding.step2.postpartum')}</FormLabel>
+                                   </FormItem>
+                                   <FormItem className="flex items-center space-x-3 space-y-0 p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                                     <FormControl>
+                                       <RadioGroupItem value="childcare" />
+                                     </FormControl>
+                                     <FormLabel className="font-normal text-base">{t('onboarding.step2.childcare')}</FormLabel>
                             </FormItem>
                           </RadioGroup>
                         </FormControl>
@@ -149,17 +151,17 @@ export function Onboarding() {
 
               {step === 3 && (
                 <div className="space-y-6">
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl font-semibold mb-2">
-                      {lifecycleStage === 'pregnancy' ? 'Когда ожидаете малыша?' : 'Когда родился малыш?'}
-                    </h3>
-                    <p className="text-muted-foreground">
-                      {lifecycleStage === 'pregnancy' 
-                        ? 'Это поможет нам рассчитать неделю беременности' 
-                        : 'Это поможет нам рассчитать возраст ребенка'
-                      }
-                    </p>
-                  </div>
+                         <div className="text-center mb-6">
+                           <h3 className="text-xl font-semibold mb-2">
+                             {lifecycleStage === 'pregnancy' ? t('onboarding.step3.pregnancy.title') : t('onboarding.step3.other.title')}
+                           </h3>
+                           <p className="text-muted-foreground">
+                             {lifecycleStage === 'pregnancy'
+                               ? t('onboarding.step3.pregnancy.subtitle')
+                               : t('onboarding.step3.other.subtitle')
+                             }
+                           </p>
+                         </div>
                   <FormField
                     control={form.control}
                     name="date"
@@ -167,8 +169,8 @@ export function Onboarding() {
                       <FormItem className="flex flex-col">
                         <FormLabel className="text-center">
                           {lifecycleStage === 'pregnancy'
-                            ? 'Предполагаемая дата родов'
-                            : 'Дата рождения ребенка'}
+                            ? t('onboarding.step3.pregnancy.label')
+                            : t('onboarding.step3.other.label')}
                         </FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -182,9 +184,9 @@ export function Onboarding() {
                               >
                                 {field.value ? (
                                   format(field.value, "PPP", { locale: ru })
-                                ) : (
-                                  <span>Выберите дату</span>
-                                )}
+                                      ) : (
+                                        <span>{t('onboarding.step3.placeholder')}</span>
+                                      )}
                                 <CalendarIcon className="ml-auto h-5 w-5 opacity-50" />
                               </Button>
                             </FormControl>
@@ -210,36 +212,36 @@ export function Onboarding() {
 
               <CardFooter className="flex justify-between p-0 pt-4">
                 {step === 1 && (
-                  <Button 
-                    type="button" 
-                    onClick={() => setStep(2)} 
-                    disabled={!form.watch('name')}
-                    className="w-full"
-                  >
-                    Далее
-                  </Button>
+                         <Button
+                           type="button"
+                           onClick={() => setStep(2)}
+                           disabled={!form.watch('name')}
+                           className="w-full"
+                         >
+                           {t('common.next')}
+                         </Button>
                 )}
                 {step === 2 && (
                   <>
                     <Button type="button" variant="ghost" onClick={() => setStep(1)}>
-                      Назад
+                      {t('common.back')}
                     </Button>
-                    <Button 
-                      type="button" 
-                      onClick={() => setStep(3)} 
+                    <Button
+                      type="button"
+                      onClick={() => setStep(3)}
                       disabled={!form.watch('lifecycleStage')}
                     >
-                      Далее
+                      {t('common.next')}
                     </Button>
                   </>
                 )}
                 {step === 3 && (
                   <>
                     <Button type="button" variant="ghost" onClick={() => setStep(2)}>
-                      Назад
+                      {t('common.back')}
                     </Button>
                     <Button type="submit" disabled={!form.watch('date')}>
-                      Начать
+                      {t('common.start')}
                     </Button>
                   </>
                 )}

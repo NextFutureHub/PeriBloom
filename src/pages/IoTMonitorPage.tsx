@@ -9,8 +9,10 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useSoftNotification } from '@/components/ui/soft-notification';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/hooks/use-translation';
 
 export default function IoTMonitorPage() {
+  const { t } = useTranslation();
   const [isSupported, setIsSupported] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const { showNotification, NotificationContainer } = useSoftNotification();
@@ -327,22 +329,22 @@ export default function IoTMonitorPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
         <Card>
-            <CardHeader>
-                <CardTitle>IoT Монитор Микроклимата</CardTitle>
-                <CardDescription>Подключите ваше Arduino-устройство для мониторинга комнаты ребенка в реальном времени.</CardDescription>
-            </CardHeader>
+        <CardHeader>
+          <CardTitle>{t('iotMonitor.title')}</CardTitle>
+          <CardDescription>{t('iotMonitor.subtitle')}</CardDescription>
+        </CardHeader>
             <CardContent>
                 {!isSupported && (
                     <Alert variant="destructive">
-                        <AlertTitle>Браузер не поддерживается</AlertTitle>
+                        <AlertTitle>{t('iotMonitor.browserNotSupported')}</AlertTitle>
                         <AlertDescription>
-                            Для использования этой функции необходим браузер с поддержкой Web Serial API, например, Google Chrome.
+                            {t('iotMonitor.browserNotSupportedDesc')}
                         </AlertDescription>
                     </Alert>
                 )}
                 {error && !isConnected && (
                     <Alert variant="destructive" className="mt-4">
-                        <AlertTitle>Ошибка</AlertTitle>
+                        <AlertTitle>{t('iotMonitor.error')}</AlertTitle>
                         <AlertDescription>{error}</AlertDescription>
                     </Alert>
                 )}
@@ -353,25 +355,25 @@ export default function IoTMonitorPage() {
                         {connectionStatus === 'connected' && (
                             <div className="flex items-center gap-2 text-green-600">
                                 <Wifi className="h-4 w-4" />
-                                <span className="text-sm font-medium">Подключено</span>
+                                <span className="text-sm font-medium">{t('iotMonitor.connected')}</span>
                             </div>
                         )}
                         {connectionStatus === 'connecting' && (
                             <div className="flex items-center gap-2 text-blue-600">
                                 <div className="h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                                <span className="text-sm font-medium">Подключение...</span>
+                                <span className="text-sm font-medium">{t('iotMonitor.connecting')}</span>
                             </div>
                         )}
                         {connectionStatus === 'error' && (
                             <div className="flex items-center gap-2 text-red-600">
                                 <WifiOff className="h-4 w-4" />
-                                <span className="text-sm font-medium">Ошибка подключения</span>
+                                <span className="text-sm font-medium">{t('iotMonitor.connectionError')}</span>
                             </div>
                         )}
                         {connectionStatus === 'disconnected' && (
                             <div className="flex items-center gap-2 text-gray-600">
                                 <WifiOff className="h-4 w-4" />
-                                <span className="text-sm font-medium">Отключено</span>
+                                <span className="text-sm font-medium">{t('iotMonitor.disconnected')}</span>
                             </div>
                         )}
                     </div>
@@ -384,8 +386,8 @@ export default function IoTMonitorPage() {
                             variant={isConnected ? "secondary" : "default"}
                             className="min-w-[160px]"
                         >
-                            {connectionStatus === 'connecting' ? 'Подключение...' : 
-                             isConnected ? 'Подключено' : 'Подключить устройство'}
+                        {connectionStatus === 'connecting' ? t('iotMonitor.connecting') :
+                         isConnected ? t('iotMonitor.connected') : t('iotMonitor.connectDevice')}
                         </Button>
                         
                         {isConnected && (
@@ -395,7 +397,7 @@ export default function IoTMonitorPage() {
                                 disabled={isDisconnecting}
                                 className="min-w-[120px]"
                             >
-                                {isDisconnecting ? 'Отключение...' : 'Отключить'}
+                                {isDisconnecting ? t('iotMonitor.deviceDisconnecting') : t('iotMonitor.disconnectDevice')}
                             </Button>
                         )}
                         
@@ -404,7 +406,7 @@ export default function IoTMonitorPage() {
                             variant="outline"
                             size="sm"
                         >
-                            {debugMode ? 'Скрыть отладку' : 'Показать отладку'}
+                            {debugMode ? t('iotMonitor.hideDebug') : t('iotMonitor.showDebug')}
                         </Button>
                         
                         {isReconnecting && !isConnected && (
@@ -413,7 +415,7 @@ export default function IoTMonitorPage() {
                                 variant="default"
                                 size="sm"
                             >
-                                Переподключить
+                                {t('iotMonitor.reconnect')}
                             </Button>
                         )}
                         
@@ -424,7 +426,7 @@ export default function IoTMonitorPage() {
                                 size="sm"
                                 disabled={forceDisconnect}
                             >
-                                {forceDisconnect ? 'Принудительное отключение...' : 'Принудительное отключение'}
+                                {forceDisconnect ? t('iotMonitor.forceDisconnect') + '...' : t('iotMonitor.forceDisconnect')}
                             </Button>
                         )}
                     </div>
@@ -432,7 +434,7 @@ export default function IoTMonitorPage() {
                     {/* Информация о последнем обновлении */}
                     {lastUpdateTime && (
                         <div className="text-center text-sm text-muted-foreground">
-                            Последнее обновление: {lastUpdateTime}
+                            {t('iotMonitor.lastUpdate')}: {lastUpdateTime}
                         </div>
                     )}
                 </div>
@@ -441,7 +443,7 @@ export default function IoTMonitorPage() {
                     <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                         <div className="flex items-center gap-2">
                             <div className="h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
-                            <span className="text-green-800 font-medium">Устройство подключено и передает данные</span>
+                            <span className="text-green-800 font-medium">{t('iotMonitor.deviceConnected')}</span>
                         </div>
                     </div>
                 )}
@@ -451,7 +453,7 @@ export default function IoTMonitorPage() {
                     <div className="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
                         <div className="flex items-center gap-2">
                             <div className="h-3 w-3 bg-orange-500 rounded-full animate-pulse"></div>
-                            <span className="text-orange-800 font-medium">Отключение устройства...</span>
+                            <span className="text-orange-800 font-medium">{t('iotMonitor.deviceDisconnecting')}</span>
                         </div>
                     </div>
                 )}
@@ -462,7 +464,7 @@ export default function IoTMonitorPage() {
                         deviceData.temp !== 'N/A' && parseFloat(deviceData.temp) > 24 && "border-red-200 bg-red-50"
                     )}>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">Температура</CardTitle>
+                            <CardTitle className="text-sm font-medium">{t('iotMonitor.temperature')}</CardTitle>
                             <div className="flex items-center gap-2">
                                 <Thermometer className="h-5 w-5 text-muted-foreground" />
                                 {deviceData.temp !== 'N/A' && parseFloat(deviceData.temp) > 24 && (
@@ -480,8 +482,8 @@ export default function IoTMonitorPage() {
                                         parseFloat(deviceData.temp) < 18 ? "destructive" : 
                                         parseFloat(deviceData.temp) > 24 ? "destructive" : "default"
                                     }>
-                                        {parseFloat(deviceData.temp) < 18 ? 'Холодно' : 
-                                         parseFloat(deviceData.temp) > 24 ? 'Жарко' : 'Комфортно'}
+                                {parseFloat(deviceData.temp) < 18 ? t('iotMonitor.cold') :
+                                 parseFloat(deviceData.temp) > 24 ? t('iotMonitor.hot') : t('iotMonitor.comfortable')}
                                     </Badge>
                                 </div>
                             )}
@@ -493,7 +495,7 @@ export default function IoTMonitorPage() {
                         deviceData.humidity !== 'N/A' && (parseFloat(deviceData.humidity) < 30 || parseFloat(deviceData.humidity) > 60) && "border-yellow-200 bg-yellow-50"
                     )}>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">Влажность</CardTitle>
+                            <CardTitle className="text-sm font-medium">{t('iotMonitor.humidity')}</CardTitle>
                             <div className="flex items-center gap-2">
                                 <Waves className="h-5 w-5 text-muted-foreground" />
                                 {deviceData.humidity !== 'N/A' && (parseFloat(deviceData.humidity) < 30 || parseFloat(deviceData.humidity) > 60) && (
@@ -511,8 +513,8 @@ export default function IoTMonitorPage() {
                                         parseFloat(deviceData.humidity) < 30 ? "secondary" : 
                                         parseFloat(deviceData.humidity) > 60 ? "secondary" : "default"
                                     }>
-                                        {parseFloat(deviceData.humidity) < 30 ? 'Сухо' : 
-                                         parseFloat(deviceData.humidity) > 60 ? 'Влажно' : 'Нормально'}
+                                {parseFloat(deviceData.humidity) < 30 ? t('iotMonitor.dry') :
+                                 parseFloat(deviceData.humidity) > 60 ? t('iotMonitor.humid') : t('iotMonitor.normal')}
                                     </Badge>
                                 </div>
                             )}
@@ -524,7 +526,7 @@ export default function IoTMonitorPage() {
                         deviceData.sound !== 'N/A' && parseFloat(deviceData.sound) > 70 && "border-orange-200 bg-orange-50"
                     )}>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">Уровень шума</CardTitle>
+                            <CardTitle className="text-sm font-medium">{t('iotMonitor.soundLevel')}</CardTitle>
                             <div className="flex items-center gap-2">
                                 <Ear className="h-5 w-5 text-muted-foreground" />
                                 {deviceData.sound !== 'N/A' && parseFloat(deviceData.sound) > 70 && (
@@ -542,8 +544,8 @@ export default function IoTMonitorPage() {
                                         parseFloat(deviceData.sound) < 40 ? "default" : 
                                         parseFloat(deviceData.sound) > 70 ? "secondary" : "default"
                                     }>
-                                        {parseFloat(deviceData.sound) < 40 ? 'Тихо' : 
-                                         parseFloat(deviceData.sound) > 70 ? 'Громко' : 'Нормально'}
+                                {parseFloat(deviceData.sound) < 40 ? t('iotMonitor.quiet') :
+                                 parseFloat(deviceData.sound) > 70 ? t('iotMonitor.loud') : t('iotMonitor.normal')}
                                     </Badge>
                                 </div>
                             )}
@@ -551,31 +553,31 @@ export default function IoTMonitorPage() {
                     </Card>
                 </div>
                  <div className="mt-6 flex items-center justify-center gap-3">
-                    <p>Индикатор состояния микроклимата:</p>
+                        <p>{t('iotMonitor.climateStatus')}:</p>
                     <div className={cn("h-6 w-6 rounded-full", climateStatus.color)}></div>
                     <p className="font-semibold">{climateStatus.text}</p>
                 </div>
 
                 {debugMode && (
                     <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                        <h3 className="text-lg font-semibold mb-3">Панель отладки</h3>
+                        <h3 className="text-lg font-semibold mb-3">{t('iotMonitor.debugPanel')}</h3>
                         <div className="space-y-3">
                             <div>
-                                <p className="text-sm font-medium text-gray-700">Текущие данные:</p>
+                                <p className="text-sm font-medium text-gray-700">{t('iotMonitor.currentData')}:</p>
                                 <pre className="text-xs bg-white p-2 rounded border overflow-auto">
                                     {JSON.stringify(deviceData, null, 2)}
                                 </pre>
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-700">Сырые данные от Arduino:</p>
+                                <p className="text-sm font-medium text-gray-700">{t('iotMonitor.rawData')}:</p>
                                 <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
                                     {rawData || 'Нет данных'}
                                 </pre>
                             </div>
                             <div className="text-xs text-gray-600">
-                                <p>Проверьте консоль браузера (F12) для подробных логов</p>
-                                <p>Поддерживаемые поля для звука: soundLevel, sound, noise, sound_ao, sound_do</p>
-                                <p>Текущий формат от Arduino: {"{"}"temperature":29.0,"humidity":14.0,"sound_ao":63,"sound_do":1{"}"}</p>
+                                <p>{t('iotMonitor.checkConsole')}</p>
+                                <p>{t('iotMonitor.supportedFields')}</p>
+                                <p>{t('iotMonitor.currentFormat')}: {"{"}"temperature":29.0,"humidity":14.0,"sound_ao":63,"sound_do":1{"}"}</p>
                             </div>
                         </div>
                     </div>
