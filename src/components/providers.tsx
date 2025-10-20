@@ -166,13 +166,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addAIMessage = (message: AIMessage) => {
     console.log('addAIMessage called with:', message);
-    // Используем функциональное обновление, чтобы получить актуальное состояние
-    setAiMessages(prevMessages => {
-      console.log('Previous aiMessages:', prevMessages);
-      const newMessages = [...prevMessages, message];
-      console.log('New messages array:', newMessages);
-      return newMessages;
-    });
+    console.log('Current aiMessages:', aiMessages);
+    const newMessages = [...aiMessages, message];
+    console.log('New messages array:', newMessages);
+    setAiMessages(newMessages);
   }
   
   const clearAIChat = () => {

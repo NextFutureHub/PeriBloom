@@ -16,7 +16,6 @@ import {
   LayoutDashboard,
   Bot,
   BookHeart,
-  HeartPulse,
   GraduationCap,
   MessageSquare,
   Thermometer,
