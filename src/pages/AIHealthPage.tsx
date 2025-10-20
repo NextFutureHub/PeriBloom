@@ -140,9 +140,16 @@ export default function AIHealthPage() {
 
     try {
       if (userData) {
+          // Подготавливаем историю сообщений для ИИ (последние 20 сообщений)
+          const messageHistory = aiMessages.slice(-20).map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }));
+          
           const result = await getAIResponse({
               lifecycleStage: userData.lifecycleStage,
-              query: values.query
+              query: values.query,
+              messageHistory: messageHistory
           });
 
           const aiResponse = {

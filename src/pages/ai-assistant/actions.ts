@@ -1,12 +1,40 @@
+// Функция для построения промпта с историей сообщений
+function buildPromptWithHistory(lifecycleStage: string, query: string, messageHistory: Array<{ role: string; content: string }>) {
+  // Берем последние 20 сообщений для контекста
+  const recentHistory = messageHistory.slice(-20);
+  
+  let historyContext = '';
+  if (recentHistory.length > 0) {
+    historyContext = '\n\nКонтекст предыдущих сообщений:\n';
+    recentHistory.forEach(msg => {
+      const role = msg.role === 'user' ? 'Пользователь' : 'Ассистент';
+      historyContext += `${role}: ${msg.content}\n`;
+    });
+  }
+
+  return `Ты - персональный AI ассистент по здоровью для матерей. Предоставляй советы, рекомендации и дыхательные упражнения на основе выбранного этапа жизни пользователя.
+
+Этап жизни пользователя: ${lifecycleStage}
+Текущий вопрос пользователя: ${query}${historyContext}
+
+ВАЖНО: Учитывай контекст предыдущих сообщений. Не повторяй приветствия, если уже здоровался. Продолжай разговор естественно, как будто помнишь всю историю общения.
+
+Отвечай на русском языке, будь дружелюбным и поддерживающим. Давай практические советы, но всегда напоминай обратиться к врачу при серьезных проблемах.`;
+}
+
 // Настоящий AI ассистент с Google Gemini API
-export async function getAIResponse({ lifecycleStage, query }: { lifecycleStage: string; query: string }) {
+export async function getAIResponse({ lifecycleStage, query, messageHistory = [] }: { 
+  lifecycleStage: string; 
+  query: string; 
+  messageHistory?: Array<{ role: string; content: string }>;
+}) {
   try {
     // Получаем API ключ из переменных окружения или используем демо ключ
     const apiKey = (import.meta as any).env.VITE_GOOGLE_AI_API_KEY || 'demo-key';
     
     if (apiKey === 'demo-key') {
       // Fallback на умные ответы если нет API ключа
-      return getSmartFallbackResponse(lifecycleStage, query);
+      return getSmartFallbackResponse(lifecycleStage, query, messageHistory);
     }
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
@@ -17,12 +45,7 @@ export async function getAIResponse({ lifecycleStage, query }: { lifecycleStage:
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `Ты - персональный AI ассистент по здоровью для матерей. Предоставляй советы, рекомендации и дыхательные упражнения на основе выбранного этапа жизни пользователя.
-
-Этап жизни пользователя: ${lifecycleStage}
-Вопрос пользователя: ${query}
-
-Отвечай на русском языке, будь дружелюбным и поддерживающим. Давай практические советы, но всегда напоминай обратиться к врачу при серьезных проблемах.`
+            text: buildPromptWithHistory(lifecycleStage, query, messageHistory)
           }]
         }],
         generationConfig: {
@@ -49,28 +72,42 @@ export async function getAIResponse({ lifecycleStage, query }: { lifecycleStage:
   } catch (error) {
     console.error('AI Assistant Error:', error);
     // Fallback на умные ответы при ошибке
-    return getSmartFallbackResponse(lifecycleStage, query);
+    return getSmartFallbackResponse(lifecycleStage, query, messageHistory);
   }
 }
 
 // Умные ответы как fallback
-function getSmartFallbackResponse(stage: string, userQuery: string) {
+function getSmartFallbackResponse(stage: string, userQuery: string, messageHistory: Array<{ role: string; content: string }> = []) {
   const query = userQuery.toLowerCase();
+  
+  // Проверяем, есть ли уже история разговора
+  const hasHistory = messageHistory.length > 0;
+  const isFirstMessage = !hasHistory || messageHistory.every(msg => msg.role === 'user');
   
   let response = "";
   
   // Ответы для беременности
   if (stage === 'pregnancy') {
     if (query.includes('тошнот') || query.includes('токсикоз')) {
-      response = "Тошнота во время беременности - это нормальное явление. Попробуйте есть небольшими порциями, избегайте жирной пищи и пейте больше воды. Если тошнота сильная, обратитесь к врачу.";
+      response = isFirstMessage 
+        ? "Тошнота во время беременности - это нормальное явление. Попробуйте есть небольшими порциями, избегайте жирной пищи и пейте больше воды. Если тошнота сильная, обратитесь к врачу."
+        : "Понимаю, что тошнота беспокоит. Попробуйте имбирь, мятный чай или сухарики. Если симптомы усиливаются, обязательно проконсультируйтесь с врачом.";
     } else if (query.includes('питани') || query.includes('еда')) {
-      response = "Во время беременности важно сбалансированное питание. Включите в рацион фолиевую кислоту, железо, кальций. Избегайте сырого мяса, рыбы с высоким содержанием ртути и непастеризованных продуктов.";
+      response = isFirstMessage
+        ? "Во время беременности важно сбалансированное питание. Включите в рацион фолиевую кислоту, железо, кальций. Избегайте сырого мяса, рыбы с высоким содержанием ртути и непастеризованных продуктов."
+        : "Продолжаем говорить о питании. Какие именно продукты вас интересуют? Могу дать более конкретные советы по вашему рациону.";
     } else if (query.includes('сон') || query.includes('спать')) {
-      response = "Сон во время беременности может быть нарушен. Попробуйте спать на боку, используйте подушки для поддержки. Избегайте кофеина во второй половине дня.";
+      response = isFirstMessage
+        ? "Сон во время беременности может быть нарушен. Попробуйте спать на боку, используйте подушки для поддержки. Избегайте кофеина во второй половине дня."
+        : "Проблемы со сном продолжаются? Попробуйте расслабляющие техники перед сном или проконсультируйтесь с врачом о безопасных способах улучшения сна.";
     } else if (query.includes('боль') || query.includes('болит')) {
-      response = "Если у вас сильные боли, особенно внизу живота, немедленно обратитесь к врачу. Легкие тянущие ощущения могут быть нормальными, но лучше проконсультироваться со специалистом.";
+      response = isFirstMessage
+        ? "Если у вас сильные боли, особенно внизу живота, немедленно обратитесь к врачу. Легкие тянущие ощущения могут быть нормальными, но лучше проконсультироваться со специалистом."
+        : "Расскажите подробнее о характере боли. Это поможет дать более точный совет. При сильных болях обязательно обратитесь к врачу.";
     } else {
-      response = "Во время беременности важно регулярно посещать врача, следить за питанием и избегать стрессов. Каждый организм индивидуален, поэтому при любых сомнениях обращайтесь к специалистам.";
+      response = isFirstMessage
+        ? "Во время беременности важно регулярно посещать врача, следить за питанием и избегать стрессов. Каждый организм индивидуален, поэтому при любых сомнениях обращайтесь к специалистам."
+        : "Что еще вас беспокоит? Я готов помочь с любыми вопросами о беременности.";
     }
   }
   // Ответы для послеродового периода
