@@ -30,9 +30,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const navItems = [
   { href: '/app/dashboard', icon: LayoutDashboard, label: 'Дашборд' },
-  { href: '/app/ai-assistant', icon: Bot, label: 'AI-ассистент' },
+  { href: '/app/ai-health', icon: Bot, label: 'AI Медпомощник' },
   { href: '/app/symptom-journal', icon: BookHeart, label: 'Журнал симптомов' },
-  { href: '/app/triage', icon: HeartPulse, label: 'Triage-анализ' },
   { href: '/app/education', icon: GraduationCap, label: 'Обучение' },
   { href: '/app/contacts', icon: MessageSquare, label: 'Контакты' },
   { href: '/app/iot-monitor', icon: Thermometer, label: 'IoT Монитор' },

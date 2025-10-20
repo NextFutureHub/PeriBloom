@@ -165,9 +165,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const addAIMessage = (message: AIMessage) => {
-    // Создаем новый массив с добавленным сообщением
-    const newMessages = [...aiMessages, message];
-    setAiMessages(newMessages);
+    console.log('addAIMessage called with:', message);
+    // Используем функциональное обновление, чтобы получить актуальное состояние
+    setAiMessages(prevMessages => {
+      console.log('Previous aiMessages:', prevMessages);
+      const newMessages = [...prevMessages, message];
+      console.log('New messages array:', newMessages);
+      return newMessages;
+    });
   }
   
   const clearAIChat = () => {

@@ -259,33 +259,19 @@ export default function DashboardPage() {
             {/* Дополнительные карточки */}
             {showAllActions && (
               <div className="grid gap-6 md:grid-cols-2 w-full max-w-4xl">
-                <Link to="/app/ai-assistant">
-                  <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
-                    <CardHeader className="text-center">
-                      <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                        <Bot className="h-8 w-8 text-blue-600" />
-                      </div>
-                      <CardTitle className="text-xl font-bold text-gray-800">AI-ассистент</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-center">
-                      <p className="text-muted-foreground">Задайте вопрос и получите персональный совет.</p>
-                    </CardContent>
-                  </Card>
-                </Link>
-                
-                <Link to="/app/triage">
-                  <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
-                    <CardHeader className="text-center">
-                      <div className="mx-auto mb-4 p-4 bg-red-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-red-200 transition-colors">
-                        <HeartPulse className="h-8 w-8 text-red-600" />
-                      </div>
-                      <CardTitle className="text-xl font-bold text-gray-800">Triage-анализ</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-center">
-                      <p className="text-muted-foreground">Оцените свои симптомы с помощью AI.</p>
-                    </CardContent>
-                  </Card>
-                </Link>
+            <Link to="/app/ai-health">
+              <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                    <Bot className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-gray-800">AI Медпомощник</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-muted-foreground">Побеседуйте с AI или проанализируйте симптомы.</p>
+                </CardContent>
+              </Card>
+            </Link>
               </div>
             )}
 

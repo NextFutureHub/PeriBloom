@@ -109,6 +109,7 @@ export default function AIHealthPage() {
   };
 
   React.useEffect(() => {
+    console.log('aiMessages updated:', aiMessages);
     scrollToBottom();
   }, [aiMessages]);
 
@@ -127,9 +128,15 @@ export default function AIHealthPage() {
       content: values.query,
     };
     
+    // Добавляем сообщение пользователя сразу
+    console.log('Adding user message:', userMessage);
     addAIMessage(userMessage);
+    // Сбрасываем форму сразу после добавления сообщения
     chatForm.reset();
     setIsThinking(true);
+    
+    // Прокручиваем к новому сообщению
+    setTimeout(scrollToBottom, 100);
 
     try {
       if (userData) {
@@ -139,17 +146,18 @@ export default function AIHealthPage() {
           });
 
           const aiResponse = {
-              id: new Date().toISOString() + '-ai',
+              id: new Date().toISOString() + '-ai-' + Math.random().toString(36).substr(2, 9),
               role: 'assistant' as const,
               content: result.success ? result.response : 'Произошла ошибка при обработке запроса',
           };
           
+          console.log('Adding AI response:', aiResponse);
           addAIMessage(aiResponse);
       }
     } catch (error) {
       console.error('Ошибка при получении ответа от AI:', error);
       const errorResponse = {
-        id: new Date().toISOString() + '-error',
+        id: new Date().toISOString() + '-error-' + Math.random().toString(36).substr(2, 9),
         role: 'assistant' as const,
         content: 'Извините, произошла ошибка при обработке вашего запроса. Попробуйте еще раз.',
       };
@@ -179,8 +187,8 @@ export default function AIHealthPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="h-[calc(100vh-8rem)] flex flex-col space-y-4">
+      <div className="flex items-center justify-between flex-shrink-0">
         <div>
           <h2 className="text-2xl font-semibold font-headline">AI Медпомощник</h2>
           <p className="text-muted-foreground">Персональный помощник для вашего здоровья</p>
@@ -193,7 +201,7 @@ export default function AIHealthPage() {
         )}
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1 flex flex-col">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="chat" className="flex items-center gap-2">
             <MessageCircle className="h-4 w-4" />
@@ -205,10 +213,10 @@ export default function AIHealthPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="chat" className="space-y-4">
-          <Card className="h-[calc(100vh-theme(spacing.32))]">
-            <CardContent className="p-0">
-              <ScrollArea className="h-[calc(100vh-theme(spacing.40))] rounded-md border p-4" ref={scrollAreaRef}>
+        <TabsContent value="chat" className="flex-1">
+          <Card className="h-full">
+            <CardContent className="p-0 flex flex-col">
+              <ScrollArea className="flex-1 rounded-md border p-4" ref={scrollAreaRef}>
                 <div className="space-y-6">
                   {aiMessages.map((message) => (
                     <div
@@ -261,7 +269,7 @@ export default function AIHealthPage() {
                 </div>
               </ScrollArea>
 
-              <div className="p-4 border-t">
+              <div className="p-4 border-t flex-shrink-0">
                 <Form {...chatForm}>
                   <form onSubmit={chatForm.handleSubmit(onChatSubmit)} className="flex items-center gap-2">
                     <FormField
@@ -285,13 +293,13 @@ export default function AIHealthPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="triage" className="space-y-4">
-          <Card>
+        <TabsContent value="triage" className="flex-1">
+          <Card className="h-full">
             <CardHeader>
               <CardTitle>AI Triage-анализ</CardTitle>
               <CardDescription>Опишите ваши симптомы, и AI поможет оценить уровень риска и даст рекомендации.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col h-full">
               <Form {...triageForm}>
                 <form onSubmit={triageForm.handleSubmit(onTriageSubmit)} className="space-y-6">
                   <FormField
@@ -301,7 +309,7 @@ export default function AIHealthPage() {
                       <FormItem>
                         <FormControl>
                           <Textarea
-                            rows={6}
+                            rows={4}
                             placeholder="Например: 'У меня сильная головная боль в области висков, тошнота и чувствительность к свету. Это продолжается уже 3 часа.'"
                             {...field}
                           />
@@ -315,16 +323,18 @@ export default function AIHealthPage() {
                 </form>
               </Form>
 
-              {isAnalyzing && (
-                <div className="mt-6 space-y-4">
-                    <Skeleton className="h-8 w-1/3" />
-                    <Skeleton className="h-20 w-full" />
-                </div>
-              )}
+              <div className="flex-1 overflow-auto">
+                {isAnalyzing && (
+                  <div className="mt-6 space-y-4">
+                      <Skeleton className="h-8 w-1/3" />
+                      <Skeleton className="h-20 w-full" />
+                  </div>
+                )}
 
-              {error && <p className="mt-4 text-destructive">{error}</p>}
-              
-              {analysisResult && <RiskResult result={analysisResult} />}
+                {error && <p className="mt-4 text-destructive">{error}</p>}
+                
+                {analysisResult && <RiskResult result={analysisResult} />}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

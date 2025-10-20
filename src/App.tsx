@@ -2,9 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AppProvider } from './components/providers'
 import HomePage from './pages/HomePage'
 import DashboardPage from './pages/DashboardPage'
-import AIAssistantPage from './pages/AIAssistantPage'
+import AIHealthPage from './pages/AIHealthPage'
 import SymptomJournalPage from './pages/SymptomJournalPage'
-import TriagePage from './pages/TriagePage'
 import EducationPage from './pages/EducationPage'
 import ContactsPage from './pages/ContactsPage'
 import IoTMonitorPage from './pages/IoTMonitorPage'
@@ -20,13 +19,15 @@ function App() {
           <Route path="/app" element={<AppLayout />}>
             <Route index element={<Navigate to="/app/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="ai-assistant" element={<AIAssistantPage />} />
+            <Route path="ai-health" element={<AIHealthPage />} />
             <Route path="symptom-journal" element={<SymptomJournalPage />} />
-            <Route path="triage" element={<TriagePage />} />
             <Route path="education" element={<EducationPage />} />
             <Route path="contacts" element={<ContactsPage />} />
             <Route path="iot-monitor" element={<IoTMonitorPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            {/* Редиректы для старых роутов */}
+            <Route path="ai-assistant" element={<Navigate to="/app/ai-health" replace />} />
+            <Route path="triage" element={<Navigate to="/app/ai-health?tab=triage" replace />} />
           </Route>
         </Routes>
       </Router>
