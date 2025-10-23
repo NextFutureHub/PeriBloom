@@ -7,7 +7,6 @@ import { ArrowRight, Bot, BookHeart, Eye, EyeOff } from 'lucide-react';
 import { differenceInWeeks, differenceInMonths, differenceInDays } from 'date-fns';
 import { Link } from 'react-router-dom';
 import PregnancySky from '@/components/PregnancySky';
-import { LanguageSwitcher } from '@/components/language-switcher';
 
 export default function DashboardPage() {
   const { userData } = useAppData();
@@ -45,7 +44,7 @@ export default function DashboardPage() {
     }
   };
 
-  const { title, value } = getStatus();
+  const { value } = getStatus();
 
   // Получаем текущую неделю беременности для фона
   const getCurrentWeek = () => {
@@ -137,9 +136,8 @@ export default function DashboardPage() {
         animate={!isMeditationMode} 
       />
       
-      {/* Кнопка переключения видимости и переключатель языка */}
-      <div className="absolute top-4 right-4 z-30 flex gap-2">
-        <LanguageSwitcher />
+      {/* Кнопка переключения видимости */}
+      <div className="absolute top-6 right-6 z-30">
         <Button
           variant="outline"
           size="sm"
@@ -147,19 +145,20 @@ export default function DashboardPage() {
             e.stopPropagation();
             setShowElements(!showElements);
           }}
-          className="bg-white/90 backdrop-blur-md border-white/20 hover:bg-white/95"
+          className="bg-gradient-to-r from-slate-50/95 to-slate-100/95 backdrop-blur-xl border-slate-200/50 hover:from-slate-100/95 hover:to-slate-200/95 shadow-lg hover:shadow-xl transition-all duration-300"
         >
           {showElements ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          <span className="ml-2">{showElements ? t('dashboard.hide') : t('dashboard.show')}</span>
+          <span className="ml-2 font-medium">{showElements ? t('dashboard.hide') : t('dashboard.show')}</span>
         </Button>
       </div>
       
       {/* Предупреждение о переходе в режим покоя */}
       {showMeditationWarning && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
-          <div className="bg-orange-50 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-orange-200 text-center animate-pulse">
-            <h3 className="text-lg font-bold text-orange-800 mb-1">{t('dashboard.meditationWarning')}</h3>
-            <p className="text-sm text-orange-600">
+        <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-30">
+          <div className="bg-gradient-to-r from-amber-50/95 to-orange-50/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-amber-200/50 text-center animate-pulse">
+            <div className="w-3 h-3 bg-amber-400 rounded-full mx-auto mb-3 animate-ping"></div>
+            <h3 className="text-xl font-bold text-amber-800 mb-2">{t('dashboard.meditationWarning')}</h3>
+            <p className="text-sm text-amber-700 font-medium">
               {t('dashboard.meditationWarningDesc')}
             </p>
           </div>
@@ -168,12 +167,13 @@ export default function DashboardPage() {
 
       {/* Подсказка когда элементы скрыты */}
       {!showElements && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/20 text-center">
-            <h3 className="text-lg font-bold text-gray-800 mb-1">
+        <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-20">
+          <div className="bg-gradient-to-r from-slate-50/95 to-gray-50/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-slate-200/50 text-center">
+            <div className="w-4 h-4 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mx-auto mb-4 animate-pulse"></div>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">
               {isMeditationMode ? t('dashboard.meditationMode') : t('dashboard.meditationModeActive')}
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-600 font-medium">
               {isMeditationMode
                 ? t('dashboard.meditationModeDesc')
                 : t('dashboard.meditationModeActiveDesc')
@@ -186,64 +186,74 @@ export default function DashboardPage() {
       {/* Основной контент */}
       <div className={`relative z-10 min-h-screen transition-all duration-500 ${showElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10 pointer-events-none'}`}>
         {/* Приветственная секция */}
-        <div className="bg-white/90 backdrop-blur-md rounded-2xl p-8 m-6 shadow-2xl border border-white/20">
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold font-headline bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              {t('dashboard.welcome', { name: userData?.name })}
-            </h1>
-            <p className="text-lg text-muted-foreground">{t('dashboard.subtitle')}</p>
+        <div className="bg-gradient-to-br from-slate-50/95 to-white/95 backdrop-blur-xl rounded-3xl p-10 mx-6 mb-6 shadow-2xl border border-slate-200/50">
+          <div className="text-center space-y-6">
+            <div className="relative">
+              <h1 className="text-5xl font-bold font-headline bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                {t('dashboard.welcome', { name: userData?.name })}
+              </h1>
+              <div className="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full animate-pulse"></div>
+            </div>
+            <p className="text-xl text-slate-600 font-medium">{t('dashboard.subtitle')}</p>
           </div>
         </div>
 
         {/* Основные карточки */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 px-6">
           {/* Карточка недели беременности */}
-          <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-            <CardHeader className="text-center pb-4">
-              <CardTitle className="text-2xl font-bold text-purple-600">{title}</CardTitle>
+          <Card className="bg-gradient-to-br from-indigo-50/95 to-purple-50/95 backdrop-blur-xl border border-indigo-200/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:from-indigo-100/95 hover:to-purple-100/95">
+            <CardHeader className="text-center pb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                <div className="w-6 h-6 bg-white rounded-full"></div>
+              </div>
             </CardHeader>
             <CardContent className="text-center">
-              <div className="text-6xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              <div className="text-7xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-3">
                 {value}
               </div>
-              <p className="text-sm text-muted-foreground">неделя беременности</p>
+              <p className="text-sm text-indigo-600 font-medium">{t('dashboard.weekOfPregnancy')}</p>
             </CardContent>
           </Card>
           
           {/* Карточка рекомендации */}
-          <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 md:col-span-2">
-            <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-green-600">{t('dashboard.recommendation')}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground text-lg leading-relaxed">
-                      {t('dashboard.recommendationText')}
-                    </p>
-                    <Button variant="link" className="px-0 mt-4 text-green-600 hover:text-green-700">
-                      {t('dashboard.learnMore')} <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+          <Card className="bg-gradient-to-br from-emerald-50/95 to-teal-50/95 backdrop-blur-xl border border-emerald-200/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:from-emerald-100/95 hover:to-teal-100/95 md:col-span-2">
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+                  <div className="w-5 h-5 bg-white rounded-full"></div>
+                </div>
+                <CardTitle className="text-2xl font-bold text-emerald-700">{t('dashboard.recommendation')}</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-slate-600 text-lg leading-relaxed font-medium mb-6">
+                {t('dashboard.recommendationText')}
+              </p>
+              <Button variant="link" className="px-0 text-emerald-600 hover:text-emerald-700 font-semibold group">
+                {t('dashboard.learnMore')} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </CardContent>
           </Card>
         </div>
 
         {/* Быстрые действия */}
         <div className="px-6 mt-8">
-        <h2 className="text-3xl font-bold font-headline text-center mb-8 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+        <h2 className="text-4xl font-bold font-headline text-center mb-10 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
           {t('dashboard.quickActions')}
         </h2>
           
           <div className="flex flex-col items-center space-y-4">
             {/* Основная карточка - всегда видна */}
             <Link to="/app/symptom-journal" className="w-full max-w-sm">
-              <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
-                <CardHeader className="text-center">
-                  <div className="mx-auto mb-4 p-4 bg-pink-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-pink-200 transition-colors">
-                    <BookHeart className="h-8 w-8 text-pink-600" />
+              <Card className="bg-gradient-to-br from-rose-50/95 to-pink-50/95 backdrop-blur-xl border border-rose-200/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:from-rose-100/95 hover:to-pink-100/95 group">
+                <CardHeader className="text-center pb-6">
+                  <div className="mx-auto mb-6 p-5 bg-gradient-to-r from-rose-500 to-pink-500 rounded-2xl w-20 h-20 flex items-center justify-center group-hover:from-rose-600 group-hover:to-pink-600 transition-all duration-300 shadow-lg">
+                    <BookHeart className="h-10 w-10 text-white" />
                   </div>
-                        <CardTitle className="text-xl font-bold text-gray-800">{t('dashboard.addSymptom')}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-center">
-                        <p className="text-muted-foreground">{t('dashboard.addSymptomDesc')}</p>
+                  <CardTitle className="text-2xl font-bold text-rose-700">{t('dashboard.addSymptom')}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-slate-600 font-medium">{t('dashboard.addSymptomDesc')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -253,7 +263,7 @@ export default function DashboardPage() {
               <Button
                 variant="outline"
                 onClick={() => setShowAllActions(true)}
-                className="bg-white/90 backdrop-blur-md border-white/20 hover:bg-white/95"
+                className="bg-gradient-to-r from-slate-50/95 to-gray-50/95 backdrop-blur-xl border-slate-200/50 hover:from-slate-100/95 hover:to-gray-100/95 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
               >
                 {t('dashboard.showMore')}
               </Button>
@@ -263,15 +273,15 @@ export default function DashboardPage() {
             {showAllActions && (
               <div className="grid gap-6 md:grid-cols-2 w-full max-w-4xl">
             <Link to="/app/ai-health">
-              <Card className="bg-white/90 backdrop-blur-md border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
-                <CardHeader className="text-center">
-                  <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                    <Bot className="h-8 w-8 text-blue-600" />
+              <Card className="bg-gradient-to-br from-blue-50/95 to-indigo-50/95 backdrop-blur-xl border border-blue-200/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:from-blue-100/95 hover:to-indigo-100/95 group">
+                <CardHeader className="text-center pb-6">
+                  <div className="mx-auto mb-6 p-5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl w-20 h-20 flex items-center justify-center group-hover:from-blue-600 group-hover:to-indigo-600 transition-all duration-300 shadow-lg">
+                    <Bot className="h-10 w-10 text-white" />
                   </div>
-                        <CardTitle className="text-xl font-bold text-gray-800">{t('dashboard.aiAssistant')}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-center">
-                        <p className="text-muted-foreground">{t('dashboard.aiAssistantDesc')}</p>
+                  <CardTitle className="text-2xl font-bold text-blue-700">{t('dashboard.aiAssistant')}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-slate-600 font-medium">{t('dashboard.aiAssistantDesc')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -283,7 +293,7 @@ export default function DashboardPage() {
               <Button
                 variant="ghost"
                 onClick={() => setShowAllActions(false)}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-slate-500 hover:text-slate-700 font-semibold hover:bg-slate-50/50 rounded-xl px-6 py-2 transition-all duration-300"
               >
                 {t('dashboard.showLess')}
               </Button>

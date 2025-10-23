@@ -26,6 +26,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAppData } from '@/hooks/use-app-data';
 import { Skeleton } from '@/components/ui/skeleton';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 const navItems = [
   { href: '/app/dashboard', icon: LayoutDashboard, label: 'Дашборд' },
@@ -111,6 +112,9 @@ export default function AppLayout() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
+          <div className="p-3 border-t border-sidebar-border">
+            <LanguageSwitcher />
+          </div>
           <div className="flex items-center gap-2 p-3">
             <Avatar>
               <AvatarImage src={`https://i.pravatar.cc/150?u=${userData.name}`} alt={userData.name} />
@@ -132,7 +136,7 @@ export default function AppLayout() {
             </h1>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-4 md:p-6 bg-transparent">
+        <main className="flex-1 overflow-auto bg-transparent">
           <Outlet />
         </main>
       </SidebarInset>
