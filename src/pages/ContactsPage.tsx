@@ -38,7 +38,7 @@ export default function ContactsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <div>
         <h2 className="text-2xl font-semibold font-headline">Контакты и поддержка</h2>
         <p className="text-muted-foreground">Важные контакты для получения помощи и поддержки</p>

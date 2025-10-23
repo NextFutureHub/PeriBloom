@@ -225,7 +225,7 @@ export default function EducationPage() {
     const progress = ((currentLessonIndex + 1) / selectedModule.lessons.length) * 100;
 
     return (
-      <div className="space-y-6">
+      <div className="p-6 space-y-6">
         <div className="flex items-center gap-4">
           <Button variant="outline" onClick={backToModules} className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
@@ -313,7 +313,7 @@ export default function EducationPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold font-headline">Образовательные материалы</h2>

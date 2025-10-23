@@ -31,7 +31,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <div>
         <h2 className="text-2xl font-semibold font-headline">Настройки</h2>
         <p className="text-muted-foreground">Управляйте своими данными и предпочтениями</p>

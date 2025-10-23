@@ -196,7 +196,7 @@ export default function AIHealthPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex flex-col">
+    <div className="h-[calc(100vh-8rem)] flex flex-col p-6">
       {/* Зафиксированный заголовок */}
       <div className="flex items-center justify-between flex-shrink-0 p-4 border-b">
         <div>

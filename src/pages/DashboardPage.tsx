@@ -184,9 +184,9 @@ export default function DashboardPage() {
       )}
       
       {/* Основной контент */}
-      <div className={`relative z-10 min-h-screen transition-all duration-500 ${showElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10 pointer-events-none'}`}>
+      <div className={`relative z-10 min-h-screen p-6 transition-all duration-500 ${showElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10 pointer-events-none'}`}>
         {/* Приветственная секция */}
-        <div className="bg-gradient-to-br from-slate-50/95 to-white/95 backdrop-blur-xl rounded-3xl p-10 mx-6 mb-6 shadow-2xl border border-slate-200/50">
+        <div className="bg-gradient-to-br from-slate-50/95 to-white/95 backdrop-blur-xl rounded-3xl p-10 mb-6 shadow-2xl border border-slate-200/50">
           <div className="text-center space-y-6">
             <div className="relative">
               <h1 className="text-5xl font-bold font-headline bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -199,7 +199,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Основные карточки */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 px-6">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Карточка недели беременности */}
           <Card className="bg-gradient-to-br from-indigo-50/95 to-purple-50/95 backdrop-blur-xl border border-indigo-200/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:from-indigo-100/95 hover:to-purple-100/95">
             <CardHeader className="text-center pb-6">
@@ -237,7 +237,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Быстрые действия */}
-        <div className="px-6 mt-8">
+        <div className="mt-8">
         <h2 className="text-4xl font-bold font-headline text-center mb-10 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
           {t('dashboard.quickActions')}
         </h2>
