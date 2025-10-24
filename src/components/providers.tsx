@@ -61,6 +61,11 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => vo
       if (item) {
         const parsed = JSON.parse(item);
         
+        // Логирование для aiMessages
+        if (key === 'peribloom-ai-messages') {
+          console.log(`Loading ${key} from localStorage:`, parsed);
+        }
+        
         // Специальная обработка для симптомов
         if (key === 'peribloom-symptoms' && Array.isArray(parsed)) {
           const cleanedSymptoms = cleanSymptomsArray(parsed);
@@ -95,6 +100,11 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T) => vo
       
       if (key === 'peribloom-symptoms' && Array.isArray(storedValue)) {
         valueToSave = cleanSymptomsArray(storedValue) as T;
+      }
+      
+      // Логирование для aiMessages
+      if (key === 'peribloom-ai-messages') {
+        console.log(`Saving ${key} to localStorage:`, valueToSave);
       }
       
       window.localStorage.setItem(key, JSON.stringify(valueToSave));
@@ -135,6 +145,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     console.log('AppProvider: Initializing...');
     console.log('AppProvider: userData from localStorage:', userData);
+    console.log('AppProvider: aiMessages from localStorage:', aiMessages);
     setIsInitialized(true);
   }, []);
 
@@ -170,6 +181,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const newMessages = [...aiMessages, message];
     console.log('New messages array:', newMessages);
     setAiMessages(newMessages);
+    console.log('aiMessages updated, should be saved to localStorage');
   }
   
   const clearAIChat = () => {

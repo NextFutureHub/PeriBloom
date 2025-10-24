@@ -24,6 +24,7 @@ import { getAIResponse } from './ai-assistant/actions';
 import { getTriageAnalysis } from './triage/actions';
 import { AnalyzeSymptomsOutput } from '@/ai/flows/ai-symptom-triage';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { AIMessage } from '@/lib/types';
 
 const chatSchema = z.object({
   query: z.string().min(1, "Сообщение не может быть пустым"),
@@ -89,6 +90,7 @@ export default function AIHealthPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalyzeSymptomsOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [localMessages, setLocalMessages] = useState<AIMessage[]>([]);
   const scrollAreaRef = React.useRef<HTMLDivElement>(null);
   
   const chatForm = useForm<z.infer<typeof chatSchema>>({
@@ -110,10 +112,19 @@ export default function AIHealthPage() {
     }
   };
 
+  // Инициализируем локальные сообщения из глобальных при загрузке
   React.useEffect(() => {
-    console.log('aiMessages updated:', aiMessages);
+    console.log('Initializing localMessages from aiMessages:', aiMessages);
+    if (aiMessages.length > 0 && localMessages.length === 0) {
+      console.log('Loading messages from localStorage');
+      setLocalMessages(aiMessages);
+    }
+  }, [aiMessages]); // Зависимость от aiMessages
+
+  React.useEffect(() => {
+    console.log('localMessages updated:', localMessages);
     scrollToBottom();
-  }, [aiMessages]);
+  }, [localMessages]);
 
   // Обработка параметра tab из URL
   useEffect(() => {
@@ -130,9 +141,16 @@ export default function AIHealthPage() {
       content: values.query,
     };
     
-    // Добавляем сообщение пользователя сразу
+    // Добавляем сообщение пользователя в локальное состояние сразу
     console.log('Adding user message:', userMessage);
+    console.log('Current localMessages before adding user message:', localMessages);
+    setLocalMessages(prev => {
+      const newMessages = [...prev, userMessage];
+      console.log('New localMessages after adding user message:', newMessages);
+      return newMessages;
+    });
     addAIMessage(userMessage);
+    
     // Сбрасываем форму сразу после добавления сообщения
     chatForm.reset();
     setIsThinking(true);
@@ -143,7 +161,8 @@ export default function AIHealthPage() {
     try {
       if (userData) {
           // Подготавливаем историю сообщений для ИИ (последние 20 сообщений)
-          const messageHistory = aiMessages.slice(-20).map(msg => ({
+          // Включаем новое сообщение пользователя в историю
+          const messageHistory = [...localMessages, userMessage].slice(-20).map(msg => ({
             role: msg.role,
             content: msg.content
           }));
@@ -161,6 +180,12 @@ export default function AIHealthPage() {
           };
           
           console.log('Adding AI response:', aiResponse);
+          console.log('Current localMessages before adding AI response:', localMessages);
+          setLocalMessages(prev => {
+            const newMessages = [...prev, aiResponse];
+            console.log('New localMessages after adding AI response:', newMessages);
+            return newMessages;
+          });
           addAIMessage(aiResponse);
       }
     } catch (error) {
@@ -170,11 +195,18 @@ export default function AIHealthPage() {
         role: 'assistant' as const,
         content: 'Извините, произошла ошибка при обработке вашего запроса. Попробуйте еще раз.',
       };
+      setLocalMessages(prev => [...prev, errorResponse]);
       addAIMessage(errorResponse);
     }
     
     setIsThinking(false);
     setTimeout(scrollToBottom, 100);
+  };
+
+  const handleClearChat = () => {
+    console.log('Clearing chat');
+    setLocalMessages([]);
+    clearAIChat();
   };
 
   const onTriageSubmit = async (values: z.infer<typeof triageSchema>) => {
@@ -201,10 +233,12 @@ export default function AIHealthPage() {
       <div className="flex items-center justify-between flex-shrink-0 p-4 border-b">
         <div>
           <h2 className="text-2xl font-semibold font-headline">{t('aiHealth.title')}</h2>
-          <p className="text-muted-foreground">{t('aiHealth.subtitle')}</p>
+          <p className="text-muted-foreground">
+            {activeTab === 'chat' ? t('aiHealth.chat.subtitle') : t('aiHealth.triage.subtitle')}
+          </p>
         </div>
         {activeTab === 'chat' && (
-          <Button variant="ghost" size="icon" onClick={clearAIChat} disabled={aiMessages.length === 0}>
+          <Button variant="ghost" size="icon" onClick={handleClearChat} disabled={localMessages.length === 0}>
               <Trash2 className="h-5 w-5"/>
               <span className="sr-only">{t('aiHealth.chat.clearChat')}</span>
           </Button>
@@ -236,7 +270,9 @@ export default function AIHealthPage() {
             <div className="flex-1 overflow-hidden">
               <ScrollArea className="h-full" ref={scrollAreaRef}>
                 <div className="p-4 space-y-6">
-                  {aiMessages.map((message) => (
+                  {localMessages.map((message) => {
+                    console.log('Rendering message:', message);
+                    return (
                     <div
                       key={message.id}
                       className={cn(
@@ -266,7 +302,8 @@ export default function AIHealthPage() {
                         </Avatar>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
                   {isThinking && (
                      <div className="flex items-start gap-3">
                         <Avatar className="h-9 w-9">

@@ -133,7 +133,7 @@ export default function DashboardPage() {
       <PregnancySky 
         currentWeek={currentWeek} 
         maxStars={isMeditationMode ? 200 : 1000} 
-        animate={!isMeditationMode} 
+        animate={true} 
       />
       
       {/* Кнопка переключения видимости */}
