@@ -138,7 +138,7 @@ export default function AppLayout() {
           </div>
           <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-slate-100/95 to-gray-100/95 rounded-2xl m-2 shadow-lg">
             <Avatar className="w-10 h-10 ring-2 ring-white shadow-md">
-              <AvatarImage src={`https://i.pravatar.cc/150?u=${userData.name}`} alt={userData.name} />
+              <AvatarImage src={userData.avatar || `https://i.pravatar.cc/150?u=${userData.name}`} alt={userData.name} />
               <AvatarFallback className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold">{userData.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">

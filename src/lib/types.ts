@@ -6,6 +6,7 @@ export interface UserData {
   dueDate?: string;
   birthDate?: string;
   language: 'ru' | 'kk' | 'en';
+  avatar?: string;
 }
 
 export interface Symptom {

@@ -146,6 +146,35 @@ export function AppProvider({ children }: { children: ReactNode }) {
     console.log('AppProvider: Initializing...');
     console.log('AppProvider: userData from localStorage:', userData);
     console.log('AppProvider: aiMessages from localStorage:', aiMessages);
+    
+    // Миграция: добавляем аватарку для существующих пользователей
+    if (userData && !userData.avatar) {
+      console.log('Adding avatar for existing user');
+      const generateNeutralAvatar = (name: string) => {
+        const colors = [
+          '6366f1', // indigo
+          '8b5cf6', // purple  
+          'ec4899', // pink
+          '06b6d4', // cyan
+          '10b981', // emerald
+          'f59e0b', // amber
+          'ef4444', // red
+          '84cc16'  // lime
+        ];
+        
+        const colorIndex = name.charCodeAt(0) % colors.length;
+        const selectedColor = colors[colorIndex];
+        
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=${selectedColor}&color=ffffff&size=150&bold=true`;
+      };
+      
+      const updatedUserData = {
+        ...userData,
+        avatar: generateNeutralAvatar(userData.name)
+      };
+      setUserData(updatedUserData);
+    }
+    
     setIsInitialized(true);
   }, []);
 

@@ -43,6 +43,27 @@ export function Onboarding() {
 
   const lifecycleStage = form.watch('lifecycleStage');
 
+  // Функция для генерации нейтральной аватарки
+  const generateNeutralAvatar = (name: string) => {
+    // Создаем нейтральную аватарку на основе имени пользователя
+    const colors = [
+      '6366f1', // indigo
+      '8b5cf6', // purple  
+      'ec4899', // pink
+      '06b6d4', // cyan
+      '10b981', // emerald
+      'f59e0b', // amber
+      'ef4444', // red
+      '84cc16'  // lime
+    ];
+    
+    // Выбираем цвет на основе имени для консистентности
+    const colorIndex = name.charCodeAt(0) % colors.length;
+    const selectedColor = colors[colorIndex];
+    
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=${selectedColor}&color=ffffff&size=150&bold=true`;
+  };
+
   const onSubmit = (values: z.infer<typeof onboardingSchema>) => {
     const userData = {
       name: values.name,
@@ -50,6 +71,7 @@ export function Onboarding() {
       dueDate: values.lifecycleStage === 'pregnancy' ? values.date.toISOString() : undefined,
       birthDate: values.lifecycleStage !== 'pregnancy' ? values.date.toISOString() : undefined,
       language: 'ru' as const,
+      avatar: generateNeutralAvatar(values.name),
     };
     setUserData(userData);
       navigate('/app/dashboard');

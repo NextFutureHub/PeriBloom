@@ -297,7 +297,7 @@ export default function AIHealthPage() {
                       </div>
                       {message.role === "user" && (
                          <Avatar className="h-9 w-9">
-                          <AvatarImage src={`https://i.pravatar.cc/150?u=${userData?.name}`} />
+                          <AvatarImage src={userData?.avatar || `https://i.pravatar.cc/150?u=${userData?.name}`} />
                           <AvatarFallback>{userData?.name?.charAt(0)}</AvatarFallback>
                         </Avatar>
                       )}
